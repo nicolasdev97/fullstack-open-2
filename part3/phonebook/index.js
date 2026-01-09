@@ -29,6 +29,14 @@ let persons = [
   },
 ];
 
+morgan.token("body", (req) => {
+  return JSON.stringify(req.body);
+});
+
+app.use(
+  morgan(":method :url :status :res[content-length] - :response-time ms :body")
+);
+
 app.get("/", (request, response) => {
   response.send("Hello, welcome to the Phonebook API!");
 });
@@ -70,9 +78,7 @@ const generateId = () => {
   return maxId;
 };
 
-const errorHandler = (request, response) => {
-  const body = request.body;
-
+const errorHandler = (body, response) => {
   if (!body.name) {
     return response.status(400).json({
       error: "Name is missing",
@@ -95,7 +101,9 @@ const errorHandler = (request, response) => {
 };
 
 app.post("/api/persons", (request, response) => {
-  errorHandler(request, response);
+  const body = request.body;
+
+  errorHandler(body, response);
 
   const person = {
     id: generateId(),
