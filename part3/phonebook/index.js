@@ -67,8 +67,32 @@ const generateId = () => {
   return maxId;
 };
 
-app.post("/api/persons", (request, response) => {
+const errorHandler = (request, response) => {
   const body = request.body;
+
+  if (!body.name) {
+    return response.status(400).json({
+      error: "Name is missing",
+    });
+  }
+
+  if (!body.number) {
+    return response.status(400).json({
+      error: "Number is missing",
+    });
+  }
+
+  const nameExists = persons.find((person) => person.name === body.name);
+
+  if (nameExists) {
+    return response.status(400).json({
+      error: "Name must be unique",
+    });
+  }
+};
+
+app.post("/api/persons", (request, response) => {
+  errorHandler(request, response);
 
   const person = {
     id: generateId(),
