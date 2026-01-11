@@ -6,8 +6,6 @@ const app = express();
 
 app.use(express.json());
 
-app.use(morgan("tiny"));
-
 app.use(cors());
 
 // Serve static files from the "dist" directory
@@ -46,12 +44,6 @@ morgan.token("body", (req) => {
 app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
-
-// Handle frontend routes
-
-app.get("*", (request, response) => {
-  response.sendFile(__dirname + "/dist/index.html");
-});
 
 app.get("/", (request, response) => {
   response.send("Hello, welcome to the Phonebook API!");
@@ -130,6 +122,12 @@ app.post("/api/persons", (request, response) => {
   persons = persons.concat(person);
 
   response.json(person);
+});
+
+// Handle frontend routes
+
+app.get("*", (request, response) => {
+  response.sendFile(__dirname + "/dist/index.html");
 });
 
 const PORT = process.env.PORT || 3001;
