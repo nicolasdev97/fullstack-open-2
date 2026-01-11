@@ -10,6 +10,11 @@ app.use(morgan("tiny"));
 
 app.use(cors());
 
+// Serve static files from the "dist" directory
+// For frontend integration
+// In backend development
+app.use(express.static("dist"));
+
 let persons = [
   {
     id: 1,
