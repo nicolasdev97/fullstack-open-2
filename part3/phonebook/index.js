@@ -120,7 +120,7 @@ app.post("/api/persons", (request, response) => {
 
 app.use(express.static("dist"));
 
-app.get("*", (request, response) => {
+app.use((request, response) => {
   response.sendFile(__dirname + "/dist/index.html");
 });
 
