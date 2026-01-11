@@ -13,6 +13,7 @@ app.use(cors());
 // Serve static files from the "dist" directory
 // For frontend integration
 // In backend development
+
 app.use(express.static("dist"));
 
 let persons = [
@@ -45,6 +46,12 @@ morgan.token("body", (req) => {
 app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
+
+// Handle frontend routes
+
+app.get("*", (request, response) => {
+  response.sendFile(__dirname + "/dist/index.html");
+});
 
 app.get("/", (request, response) => {
   response.send("Hello, welcome to the Phonebook API!");
