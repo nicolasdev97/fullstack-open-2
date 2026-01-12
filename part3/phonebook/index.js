@@ -8,28 +8,46 @@ app.use(express.json());
 
 app.use(cors());
 
-let persons = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: 4,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
+require("dotenv").config();
+const mongoose = require("mongoose");
+
+// Connection to MongoDB
+
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log("connected to MongoDB");
+  })
+  .catch((error) => {
+    console.log("error connecting to MongoDB:", error.message);
+  });
+
+// let persons = [
+//   {
+//     id: 1,
+//     name: "Arto Hellas",
+//     number: "040-123456",
+//   },
+//   {
+//     id: 2,
+//     name: "Ada Lovelace",
+//     number: "39-44-5323523",
+//   },
+//   {
+//     id: 3,
+//     name: "Dan Abramov",
+//     number: "12-43-234345",
+//   },
+//   {
+//     id: 4,
+//     name: "Mary Poppendieck",
+//     number: "39-23-6423122",
+//   },
+// ];
+
+// Importing Person model
+
+const Person = require("./models/person");
 
 morgan.token("body", (req) => {
   return JSON.stringify(req.body);
@@ -41,8 +59,14 @@ app.use(
 
 // API routes
 
-app.get("/api/persons", (request, response) => {
-  response.json(persons);
+// app.get("/api/persons", (request, response) => {
+//   response.json(persons);
+// });
+
+app.get("/api/persons", (req, res) => {
+  Person.find({}).then((persons) => {
+    res.json(persons);
+  });
 });
 
 app.get("/info", (request, response) => {
