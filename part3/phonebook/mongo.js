@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
-// ----- VALIDAR ARGUMENTOS -----
+// Conecttion to MongoDB
+
 if (process.argv.length < 3) {
   console.log("Please provide the password as an argument");
   process.exit(1);
@@ -8,13 +9,13 @@ if (process.argv.length < 3) {
 
 const password = process.argv[2];
 
-// ----- CONEXIÓN -----
 const url = `mongodb+srv://nicolas_db_user:${password}@cluster0.nhphrws.mongodb.net/phonebook?appName=Cluster0`;
 
 mongoose.set("strictQuery", false);
 mongoose.connect(url);
 
-// ----- SCHEMA Y MODELO -----
+// Schema and Model
+
 const personSchema = new mongoose.Schema({
   name: String,
   number: String,
@@ -22,7 +23,8 @@ const personSchema = new mongoose.Schema({
 
 const Person = mongoose.model("Person", personSchema);
 
-// ----- SOLO LISTAR PERSONAS -----
+// Get all persons
+
 if (process.argv.length === 3) {
   console.log("phonebook:");
 
@@ -36,7 +38,7 @@ if (process.argv.length === 3) {
   return;
 }
 
-// ----- AGREGAR PERSONA -----
+// Add a new person
 const name = process.argv[3];
 const number = process.argv[4];
 
