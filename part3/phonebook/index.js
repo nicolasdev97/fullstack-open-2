@@ -124,20 +124,36 @@ const errorHandler = (body, response) => {
   }
 };
 
-app.post("/api/persons", (request, response) => {
-  const body = request.body;
+// app.post("/api/persons", (request, response) => {
+//   const body = request.body;
 
-  errorHandler(body, response);
+//   errorHandler(body, response);
 
-  const person = {
-    id: generateId(),
+//   const person = {
+//     id: generateId(),
+//     name: body.name,
+//     number: body.number,
+//   };
+
+//   persons = persons.concat(person);
+
+//   response.json(person);
+// });
+
+app.post("/api/persons", (req, res, next) => {
+  const body = req.body;
+
+  const person = new Person({
     name: body.name,
     number: body.number,
-  };
+  });
 
-  persons = persons.concat(person);
-
-  response.json(person);
+  person
+    .save()
+    .then((savedPerson) => {
+      res.json(savedPerson);
+    })
+    .catch((error) => next(error));
 });
 
 // Frontend integration
