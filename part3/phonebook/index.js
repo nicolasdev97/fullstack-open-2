@@ -63,19 +63,34 @@ app.use(
 //   response.json(persons);
 // });
 
-app.get("/api/persons", (request, response) => {
-  Person.find({}).then((persons) => {
-    response.json(persons);
-  });
+app.get("/api/persons", (request, response, next) => {
+  Person.find({})
+    .then((persons) => {
+      response.json(persons);
+    })
+    .catch((error) => next(error));
 });
 
-app.get("/info", (request, response) => {
-  const numberOfPersons = persons.length;
-  const date = new Date();
+// app.get("/info", (request, response) => {
+//   const numberOfPersons = persons.length;
+//   const date = new Date();
 
-  response.send(
-    `<p>Phonebook has info for ${numberOfPersons} people</p><p>${date}</p>`
-  );
+//   response.send(
+//     `<p>Phonebook has info for ${numberOfPersons} people</p><p>${date}</p>`
+//   );
+// });
+
+app.get("/info", (request, response, next) => {
+  Person.countDocuments({})
+    .then((count) => {
+      const date = new Date();
+
+      response.send(
+        `<p>Phonebook has info for ${count} people</p>
+         <p>${date}</p>`
+      );
+    })
+    .catch((error) => next(error));
 });
 
 app.get("/api/persons/:id", (request, response) => {
@@ -99,8 +114,12 @@ app.get("/api/persons/:id", (request, response) => {
 
 app.delete("/api/persons/:id", (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
-    .then(() => {
-      response.status(204).end();
+    .then((result) => {
+      if (result) {
+        response.status(204).end();
+      } else {
+        response.status(404).json({ error: "person not found" });
+      }
     })
     .catch((error) => next(error));
 });
@@ -163,6 +182,24 @@ app.post("/api/persons", (request, response, next) => {
     })
     .catch((error) => next(error));
 });
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "unknown endpoint" });
+};
+
+app.use(unknownEndpoint);
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
 
 // Frontend integration
 
