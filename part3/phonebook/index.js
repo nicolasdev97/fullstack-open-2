@@ -63,9 +63,9 @@ app.use(
 //   response.json(persons);
 // });
 
-app.get("/api/persons", (req, res) => {
+app.get("/api/persons", (request, response) => {
   Person.find({}).then((persons) => {
-    res.json(persons);
+    response.json(persons);
   });
 });
 
@@ -90,39 +90,47 @@ app.get("/api/persons/:id", (request, response) => {
   }
 });
 
-app.delete("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  persons = persons.filter((person) => person.id !== id);
+// app.delete("/api/persons/:id", (request, response) => {
+//   const id = Number(request.params.id);
+//   persons = persons.filter((person) => person.id !== id);
 
-  response.status(204).end();
+//   response.status(204).end();
+// });
+
+app.delete("/api/persons/:id", (request, response, next) => {
+  Person.findByIdAndDelete(request.params.id)
+    .then(() => {
+      response.status(204).end();
+    })
+    .catch((error) => next(error));
 });
 
-const generateId = () => {
-  const maxId = Math.floor(Math.random() * (10000 - 5) + 5);
-  return maxId;
-};
+// const generateId = () => {
+//   const maxId = Math.floor(Math.random() * (10000 - 5) + 5);
+//   return maxId;
+// };
 
-const errorHandler = (body, response) => {
-  if (!body.name) {
-    return response.status(400).json({
-      error: "Name is missing",
-    });
-  }
+// const errorHandler = (body, response) => {
+//   if (!body.name) {
+//     return response.status(400).json({
+//       error: "Name is missing",
+//     });
+//   }
 
-  if (!body.number) {
-    return response.status(400).json({
-      error: "Number is missing",
-    });
-  }
+//   if (!body.number) {
+//     return response.status(400).json({
+//       error: "Number is missing",
+//     });
+//   }
 
-  const nameExists = persons.find((person) => person.name === body.name);
+//   const nameExists = persons.find((person) => person.name === body.name);
 
-  if (nameExists) {
-    return response.status(400).json({
-      error: "Name must be unique",
-    });
-  }
-};
+//   if (nameExists) {
+//     return response.status(400).json({
+//       error: "Name must be unique",
+//     });
+//   }
+// };
 
 // app.post("/api/persons", (request, response) => {
 //   const body = request.body;
@@ -140,8 +148,8 @@ const errorHandler = (body, response) => {
 //   response.json(person);
 // });
 
-app.post("/api/persons", (req, res, next) => {
-  const body = req.body;
+app.post("/api/persons", (request, response, next) => {
+  const body = request.body;
 
   const person = new Person({
     name: body.name,
