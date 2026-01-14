@@ -205,6 +205,14 @@ app.put("/api/persons/:id", (request, response, next) => {
     .catch((error) => next(error));
 });
 
+// Frontend integration
+
+app.use(express.static("dist"));
+
+app.use((request, response) => {
+  response.sendFile(__dirname + "/dist/index.html");
+});
+
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });
 };
@@ -222,14 +230,6 @@ const errorHandler = (error, request, response, next) => {
 };
 
 app.use(errorHandler);
-
-// Frontend integration
-
-app.use(express.static("dist"));
-
-app.use((request, response) => {
-  response.sendFile(__dirname + "/dist/index.html");
-});
 
 const PORT = process.env.PORT || 3001;
 
