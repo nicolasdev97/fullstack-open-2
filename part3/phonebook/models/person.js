@@ -1,5 +1,17 @@
 const mongoose = require("mongoose");
 
+const phoneValidator = (value) => {
+  // Min length 8 characters
+  if (value.length < 8) {
+    return false;
+  }
+
+  // Format XX-XXXXXXX or XXX-XXXXXXX
+  const regex = /^\d{2,3}-\d+$/;
+
+  return regex.test(value);
+};
+
 const personSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -9,6 +21,11 @@ const personSchema = new mongoose.Schema({
   number: {
     type: String,
     required: true,
+    validate: {
+      validator: phoneValidator,
+      message:
+        "Phone number must be at least 8 characters and in format XX-XXXXXXX or XXX-XXXXXXX",
+    },
   },
 });
 
