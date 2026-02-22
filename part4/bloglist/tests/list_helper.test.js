@@ -3,7 +3,7 @@ const assert = require("node:assert");
 const listHelper = require("../utils/list_helper");
 const helper = require("./test_helper");
 
-// Creates the tests for the functions in list_helper.js.
+// Creates the tests for the functions in list_helper.js
 
 test("dummy returns one", () => {
   const blogs = helper.emptyList;
@@ -42,6 +42,40 @@ describe("favorite blog", () => {
 
   test("returns null when list is empty", () => {
     const result = listHelper.favoriteBlog([]);
+    assert.strictEqual(result, null);
+  });
+});
+
+describe("most blogs", () => {
+  test("returns author with most blogs", () => {
+    const result = listHelper.mostBlogs(helper.listWithManyBlogs);
+
+    assert.deepStrictEqual(result, {
+      author: "Robert C. Martin",
+      blogs: 3,
+    });
+  });
+
+  test("returns null when list is empty", () => {
+    const result = listHelper.mostBlogs([]);
+
+    assert.strictEqual(result, null);
+  });
+});
+
+describe("most blogs with lodash", () => {
+  test("returns author with most blogs with lodash", () => {
+    const result = listHelper.mostBlogsWithLodash(helper.listWithManyBlogs);
+
+    assert.deepStrictEqual(result, {
+      author: "Robert C. Martin",
+      blogs: 3,
+    });
+  });
+
+  test("returns null when list is empty", () => {
+    const result = listHelper.mostBlogsWithLodash([]);
+
     assert.strictEqual(result, null);
   });
 });
