@@ -1,9 +1,14 @@
-// Creates an example function to test the testing framework.
+// Creates the functions to test the testing framework.
 
-const dummy = (blogs) => {
+const dummy = () => {
   return 1;
+};
+
+const totalLikes = (blogs) => {
+  return blogs.reduce((sum, blog) => sum + blog.likes, 0);
 };
 
 module.exports = {
   dummy,
+  totalLikes,
 };
