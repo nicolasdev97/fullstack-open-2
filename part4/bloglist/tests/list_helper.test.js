@@ -79,3 +79,37 @@ describe("most blogs with lodash", () => {
     assert.strictEqual(result, null);
   });
 });
+
+describe("most likes", () => {
+  test("returns author with most total likes", () => {
+    const result = listHelper.mostLikes(helper.listWithManyBlogs);
+
+    assert.deepStrictEqual(result, {
+      author: "Edsger W. Dijkstra",
+      likes: 17,
+    });
+  });
+
+  test("returns null when list is empty", () => {
+    const result = listHelper.mostLikes([]);
+
+    assert.strictEqual(result, null);
+  });
+});
+
+describe("most likes with lodash", () => {
+  test("returns author with most total likes with lodash", () => {
+    const result = listHelper.mostLikesWithLodash(helper.listWithManyBlogs);
+
+    assert.deepStrictEqual(result, {
+      author: "Edsger W. Dijkstra",
+      likes: 17,
+    });
+  });
+
+  test("returns null when list is empty", () => {
+    const result = listHelper.mostLikesWithLodash([]);
+
+    assert.strictEqual(result, null);
+  });
+});

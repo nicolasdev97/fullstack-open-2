@@ -60,10 +60,51 @@ const mostBlogsWithLodash = (blogs) => {
   return result;
 };
 
+const mostLikes = (blogs) => {
+  if (blogs.length === 0) return null;
+
+  const authorLikes = {};
+
+  blogs.forEach((blog) => {
+    authorLikes[blog.author] = (authorLikes[blog.author] || 0) + blog.likes;
+  });
+
+  let topAuthor = null;
+  let maxLikes = 0;
+
+  for (const author in authorLikes) {
+    if (authorLikes[author] > maxLikes) {
+      maxLikes = authorLikes[author];
+      topAuthor = author;
+    }
+  }
+
+  return {
+    author: topAuthor,
+    likes: maxLikes,
+  };
+};
+
+const mostLikesWithLodash = (blogs) => {
+  if (blogs.length === 0) return null;
+
+  const result = _(blogs)
+    .groupBy("author")
+    .map((blogs, author) => ({
+      author,
+      likes: _.sumBy(blogs, "likes"),
+    }))
+    .maxBy("likes");
+
+  return result;
+};
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
   mostBlogs,
   mostBlogsWithLodash,
+  mostLikes,
+  mostLikesWithLodash,
 };
