@@ -1,4 +1,5 @@
 require("dotenv").config();
+require("./utils/db");
 
 // Configure express app and middlewares
 
