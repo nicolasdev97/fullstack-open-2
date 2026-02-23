@@ -3,9 +3,15 @@ const mongoose = require("mongoose");
 // Define the schema for the database entries
 
 const blogSchema = new mongoose.Schema({
-  title: String,
+  title: {
+    type: String,
+    required: true,
+  },
   author: String,
-  url: String,
+  url: {
+    type: String,
+    required: true,
+  },
   likes: {
     type: Number,
     default: 0,
