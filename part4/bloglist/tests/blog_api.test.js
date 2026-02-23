@@ -129,6 +129,24 @@ test("a blog can be deleted", async () => {
   assert(!titles.includes(blogToDelete.title));
 });
 
+test("a blog likes can be updated", async () => {
+  const blogsAtStart = await Blog.find({});
+  const blogToUpdate = blogsAtStart[0];
+
+  const updatedBlog = {
+    ...blogToUpdate.toJSON(),
+    likes: blogToUpdate.likes + 10,
+  };
+
+  const response = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(updatedBlog)
+    .expect(200)
+    .expect("Content-Type", /application\/json/);
+
+  assert.strictEqual(response.body.likes, blogToUpdate.likes + 10);
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
