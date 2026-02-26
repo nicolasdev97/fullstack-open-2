@@ -38,10 +38,6 @@ usersRouter.post("/", async (request, response) => {
 
     response.status(400).json({ error: error.message });
   }
-
-  const savedUser = await user.save();
-
-  response.status(201).json(savedUser);
 });
 
 usersRouter.get("/", async (request, response) => {
