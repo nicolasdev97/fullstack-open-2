@@ -13,25 +13,12 @@ blogsRouter.get("/", async (request, response) => {
 });
 
 blogsRouter.post("/", async (request, response) => {
-  const body = request.body;
-
-  const token = request.token;
-
-  if (!token) {
-    return response.status(401).json({ error: "token missing" });
-  }
-
-  const decodedToken = jwt.verify(token, process.env.SECRET);
-
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: "token invalid" });
-  }
-
-  const user = await User.findById(decodedToken.id);
+  const user = request.user;
 
   const blog = new Blog({
-    ...body,
-    likes: body.likes || 0,
+    title: request.body.title,
+    author: request.body.author,
+    url: request.body.url,
     user: user._id,
   });
 
@@ -44,32 +31,20 @@ blogsRouter.post("/", async (request, response) => {
 });
 
 blogsRouter.delete("/:id", async (request, response) => {
-  try {
-    const decodedToken = jwt.verify(request.token, process.env.SECRET);
+  const user = request.user;
+  const blog = await Blog.findById(request.params.id);
 
-    if (!decodedToken.id) {
-      return response.status(401).json({ error: "token invalid" });
-    }
-
-    const blog = await Blog.findById(request.params.id);
-
-    if (!blog) {
-      console.log("Blog not found with ID:", request.params.id);
-      return response.status(404).json({ error: "blog not found" });
-    }
-
-    if (blog.user.toString() !== decodedToken.id.toString()) {
-      return response
-        .status(403)
-        .json({ error: "not authorized to delete this blog" });
-    }
-
-    await Blog.findByIdAndDelete(request.params.id);
-
-    response.status(204).end();
-  } catch (error) {
-    response.status(401).json({ error: "token invalid" });
+  if (!blog) {
+    return response.status(404).json({ error: "blog not found" });
   }
+
+  if (blog.user.toString() !== user._id.toString()) {
+    return response.status(403).json({ error: "not authorized" });
+  }
+
+  await Blog.findByIdAndDelete(request.params.id);
+
+  response.status(204).end();
 });
 
 blogsRouter.put("/:id", async (request, response) => {
