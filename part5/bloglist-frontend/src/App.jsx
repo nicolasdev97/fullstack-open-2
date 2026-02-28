@@ -111,6 +111,19 @@ const App = () => {
     );
   };
 
+  // Delete a blog
+
+  const handleDelete = async (blog) => {
+    const confirmDelete = window.confirm(
+      `Remove blog ${blog.title} by ${blog.author}?`,
+    );
+
+    if (!confirmDelete) return;
+
+    await blogService.remove(blog.id);
+    setBlogs(blogs.filter((b) => b.id !== blog.id));
+  };
+
   let content = null;
 
   if (!user) {
@@ -133,7 +146,12 @@ const App = () => {
           <AddBlogForm createBlog={createBlog} />
         </Togglable>
 
-        <BlogsView blogs={blogs} handleLike={handleLike} />
+        <BlogsView
+          blogs={blogs}
+          user={user}
+          handleLike={handleLike}
+          handleDelete={handleDelete}
+        />
       </div>
     );
   }
