@@ -104,7 +104,11 @@ const App = () => {
 
     const returnedBlog = await blogService.update(blog.id, updatedBlog);
 
-    setBlogs(blogs.map((b) => (b.id === blog.id ? returnedBlog : b)));
+    setBlogs(
+      blogs.map((b) =>
+        b.id === blog.id ? { ...returnedBlog, user: blog.user } : b,
+      ),
+    );
   };
 
   let content = null;
