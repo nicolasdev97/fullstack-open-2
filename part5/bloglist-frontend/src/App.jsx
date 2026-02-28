@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
+
 import LoginForm from "./components/LoginForm";
 import BlogsView from "./components/BlogsView";
+import AddBlogForm from "./components/AddBlogForm";
+import Notification from "./components/Notification";
+
 import blogService from "./services/blogs";
 import loginService from "./services/login";
-import AddBlogForm from "./components/AddBlogForm";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -15,11 +18,23 @@ const App = () => {
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
 
+  const [notification, setNotification] = useState(null);
+
   // Get all blogs
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
   }, []);
+
+  // Show notification
+
+  const showNotification = (message, type) => {
+    setNotification({ message, type });
+
+    setTimeout(() => {
+      setNotification(null);
+    }, 5000);
+  };
 
   // Check if user is logged in
 
@@ -39,19 +54,16 @@ const App = () => {
     event.preventDefault();
 
     try {
-      const user = await loginService.login({
-        username,
-        password,
-      });
+      const user = await loginService.login({ username, password });
 
       window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
 
       blogService.setToken(user.token);
       setUser(user);
-      setUsername("");
-      setPassword("");
-    } catch (exception) {
-      console.log("Wrong credentials", exception);
+
+      showNotification(`Welcome ${user.name}`, "success");
+    } catch {
+      showNotification("Wrong credentials", "error");
     }
   };
 
@@ -79,16 +91,19 @@ const App = () => {
 
       setBlogs(blogs.concat(returnedBlog));
 
-      setTitle("");
-      setAuthor("");
-      setUrl("");
-    } catch (exception) {
-      console.log("Error creating blog", exception);
+      showNotification(
+        `A new blog "${returnedBlog.title}" by ${returnedBlog.author} added`,
+        "success",
+      );
+    } catch {
+      showNotification("Error creating blog", "error");
     }
   };
 
-  if (user === null) {
-    return (
+  let content = null;
+
+  if (!user) {
+    content = (
       <LoginForm
         handleLogin={handleLogin}
         username={username}
@@ -97,23 +112,30 @@ const App = () => {
         setPassword={setPassword}
       />
     );
+  } else {
+    content = (
+      <div>
+        <h2>blogs</h2>
+        <p>{user.name} logged in</p>
+        <button onClick={handleLogout}>logout</button>
+        <AddBlogForm
+          addBlog={addBlog}
+          title={title}
+          setTitle={setTitle}
+          author={author}
+          setAuthor={setAuthor}
+          url={url}
+          setUrl={setUrl}
+        />
+        <BlogsView blogs={blogs} />
+      </div>
+    );
   }
 
   return (
     <div>
-      <h2>blogs</h2>
-      <p>{user.name} logged in</p>
-      <button onClick={handleLogout}>logout</button>
-      <AddBlogForm
-        addBlog={addBlog}
-        title={title}
-        setTitle={setTitle}
-        author={author}
-        setAuthor={setAuthor}
-        url={url}
-        setUrl={setUrl}
-      />
-      <BlogsView blogs={blogs} />
+      <Notification notification={notification} />
+      {content}
     </div>
   );
 };
