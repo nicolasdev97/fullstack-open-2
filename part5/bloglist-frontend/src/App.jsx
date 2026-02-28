@@ -93,6 +93,20 @@ const App = () => {
     }
   };
 
+  // Like a blog
+
+  const handleLike = async (blog) => {
+    const updatedBlog = {
+      ...blog,
+      likes: blog.likes + 1,
+      user: blog.user.id,
+    };
+
+    const returnedBlog = await blogService.update(blog.id, updatedBlog);
+
+    setBlogs(blogs.map((b) => (b.id === blog.id ? returnedBlog : b)));
+  };
+
   let content = null;
 
   if (!user) {
@@ -115,7 +129,7 @@ const App = () => {
           <AddBlogForm createBlog={createBlog} />
         </Togglable>
 
-        <BlogsView blogs={blogs} />
+        <BlogsView blogs={blogs} handleLike={handleLike} />
       </div>
     );
   }
