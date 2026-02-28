@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import LoginForm from "./components/LoginForm";
 import BlogsView from "./components/BlogsView";
 import AddBlogForm from "./components/AddBlogForm";
 import Notification from "./components/Notification";
+import Togglable from "./components/Togglable";
 
 import blogService from "./services/blogs";
 import loginService from "./services/login";
@@ -14,11 +15,9 @@ const App = () => {
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
 
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
-
   const [notification, setNotification] = useState(null);
+
+  const blogFormRef = useRef();
 
   // Get all blogs
 
@@ -77,16 +76,8 @@ const App = () => {
 
   // Add new blog
 
-  const addBlog = async (event) => {
-    event.preventDefault();
-
+  const createBlog = async (blogObject) => {
     try {
-      const blogObject = {
-        title,
-        author,
-        url,
-      };
-
       const returnedBlog = await blogService.create(blogObject);
 
       setBlogs(blogs.concat(returnedBlog));
@@ -95,6 +86,8 @@ const App = () => {
         `A new blog "${returnedBlog.title}" by ${returnedBlog.author} added`,
         "success",
       );
+
+      blogFormRef.current.toggleVisibility();
     } catch {
       showNotification("Error creating blog", "error");
     }
@@ -118,15 +111,10 @@ const App = () => {
         <h2>blogs</h2>
         <p>{user.name} logged in</p>
         <button onClick={handleLogout}>logout</button>
-        <AddBlogForm
-          addBlog={addBlog}
-          title={title}
-          setTitle={setTitle}
-          author={author}
-          setAuthor={setAuthor}
-          url={url}
-          setUrl={setUrl}
-        />
+        <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+          <AddBlogForm createBlog={createBlog} />
+        </Togglable>
+
         <BlogsView blogs={blogs} />
       </div>
     );
