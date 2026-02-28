@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
-import Blog from "./components/Blog";
+import LoginForm from "./components/LoginForm";
+import BlogsView from "./components/BlogsView";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
+import AddBlogForm from "./components/AddBlogForm";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -87,27 +89,13 @@ const App = () => {
 
   if (user === null) {
     return (
-      <div>
-        <h2>Log in to application</h2>
-        <form onSubmit={handleLogin}>
-          <div>
-            username
-            <input
-              value={username}
-              onChange={({ target }) => setUsername(target.value)}
-            />
-          </div>
-          <div>
-            password
-            <input
-              type="password"
-              value={password}
-              onChange={({ target }) => setPassword(target.value)}
-            />
-          </div>
-          <button type="submit">login</button>
-        </form>
-      </div>
+      <LoginForm
+        handleLogin={handleLogin}
+        username={username}
+        setUsername={setUsername}
+        password={password}
+        setPassword={setPassword}
+      />
     );
   }
 
@@ -116,35 +104,16 @@ const App = () => {
       <h2>blogs</h2>
       <p>{user.name} logged in</p>
       <button onClick={handleLogout}>logout</button>
-      <form onSubmit={addBlog}>
-        <div>
-          title:
-          <input
-            value={title}
-            onChange={({ target }) => setTitle(target.value)}
-          />
-        </div>
-
-        <div>
-          author:
-          <input
-            value={author}
-            onChange={({ target }) => setAuthor(target.value)}
-          />
-        </div>
-
-        <div>
-          url:
-          <input value={url} onChange={({ target }) => setUrl(target.value)} />
-        </div>
-
-        <button type="submit">create</button>
-      </form>
-      {blogs.map((blog) => (
-        <div key={blog.id}>
-          {blog.title} {blog.author}
-        </div>
-      ))}
+      <AddBlogForm
+        addBlog={addBlog}
+        title={title}
+        setTitle={setTitle}
+        author={author}
+        setAuthor={setAuthor}
+        url={url}
+        setUrl={setUrl}
+      />
+      <BlogsView blogs={blogs} />
     </div>
   );
 };
