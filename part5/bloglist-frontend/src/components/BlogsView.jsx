@@ -1,10 +1,10 @@
+import Blog from "./Blog";
+
 const BlogsView = ({ blogs }) => {
   return (
     <div>
       {blogs.map((blog) => (
-        <div key={blog.id}>
-          {blog.title} {blog.author}
-        </div>
+        <Blog key={blog.id} blog={blog} />
       ))}
     </div>
   );
