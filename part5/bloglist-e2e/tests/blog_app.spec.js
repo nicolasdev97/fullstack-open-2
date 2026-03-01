@@ -84,6 +84,50 @@ describe("When logged in", () => {
 
     // Verify that the new blog appears in the list of blogs
 
-    await expect(page.getByText("Playwright Testing Juan Pérez")).toBeVisible();
+    await expect(
+      page.locator(".blog-summary", { hasText: "Playwright Testing" }),
+    ).toBeVisible();
+    await expect(
+      page.locator(".blog-summary", { hasText: "Juan Pérez" }),
+    ).toBeVisible();
+  });
+
+  test("a blog can be liked", async ({ page }) => {
+    // Create a new blog to like
+    await page.getByRole("button", { name: "create new blog" }).click();
+
+    // Fill in the form with blog details
+
+    await page.getByPlaceholder("Title").fill("Like Testing");
+    await page.getByPlaceholder("Author").fill("Juan Pérez");
+    await page.getByPlaceholder("URL").fill("https://test.com");
+
+    // Submit the form to create the blog
+
+    await page.getByRole("button", { name: "create" }).click();
+
+    // Verify that the new blog appears in the list of blogs
+
+    const blog = page.locator(".blog", {
+      hasText: "Like Testing",
+    });
+
+    await expect(blog).toBeVisible();
+
+    // Click the button to show blog details
+
+    await blog.getByRole("button", { name: "view" }).click();
+
+    // Verify the initial number of likes is 0
+
+    await expect(blog.getByText("likes 0")).toBeVisible();
+
+    // Click the like button
+
+    await blog.getByRole("button", { name: "like" }).click();
+
+    // Verify that the number of likes has increased to 1
+
+    await expect(blog.getByText("likes 1")).toBeVisible();
   });
 });
