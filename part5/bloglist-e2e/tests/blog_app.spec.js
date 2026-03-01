@@ -1,26 +1,26 @@
 const { test, expect, beforeEach, describe } = require("@playwright/test");
 
-describe("Blog app", () => {
-  beforeEach(async ({ page, request }) => {
-    // Clear database
+beforeEach(async ({ page, request }) => {
+  // Clear database
 
-    await request.post("http://localhost:3003/api/testing/reset");
+  await request.post("http://localhost:3003/api/testing/reset");
 
-    // Create a user to test login
+  // Create a user to test login
 
-    await request.post("http://localhost:3003/api/users", {
-      data: {
-        name: "Juan Pérez",
-        username: "juan",
-        password: "12345",
-      },
-    });
-
-    // Go to the application frontend
-
-    await page.goto("http://localhost:5173");
+  await request.post("http://localhost:3003/api/users", {
+    data: {
+      name: "Juan Pérez",
+      username: "juan",
+      password: "12345",
+    },
   });
 
+  // Go to the application frontend
+
+  await page.goto("http://localhost:5173");
+});
+
+describe("Blog app", () => {
   test("Login form is shown", async ({ page }) => {
     // Check that the login form is visible
 
@@ -51,5 +51,39 @@ describe("Blog app", () => {
 
       await expect(page.getByText("Wrong credentials")).toBeVisible();
     });
+  });
+});
+
+describe("When logged in", () => {
+  beforeEach(async ({ page }) => {
+    // Log in with correct credentials
+
+    await page.getByPlaceholder("Username").fill("juan");
+    await page.getByPlaceholder("Password").fill("12345");
+    await page.getByRole("button", { name: "login" }).click();
+
+    // Check that the user is logged in
+
+    await expect(page.getByText("Juan Pérez logged in")).toBeVisible();
+  });
+
+  test("a new blog can be created", async ({ page }) => {
+    // Click the button to show the form for creating a new blog
+
+    await page.getByRole("button", { name: "create new blog" }).click();
+
+    // Fill in the form with blog details
+
+    await page.getByPlaceholder("Title").fill("Playwright Testing");
+    await page.getByPlaceholder("Author").fill("Juan Pérez");
+    await page.getByPlaceholder("URL").fill("https://playwright.dev");
+
+    // Submit the form to create the blog
+
+    await page.getByRole("button", { name: "create" }).click();
+
+    // Verify that the new blog appears in the list of blogs
+
+    await expect(page.getByText("Playwright Testing Juan Pérez")).toBeVisible();
   });
 });
