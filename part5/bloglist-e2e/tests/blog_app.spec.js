@@ -130,4 +130,46 @@ describe("When logged in", () => {
 
     await expect(blog.getByText("likes 1")).toBeVisible();
   });
+
+  test("a blog can be deleted by its creator", async ({ page }) => {
+    // Create a new blog to delete
+
+    await page.getByRole("button", { name: "new blog" }).click();
+
+    // Fill in the form with blog details
+
+    await page.getByPlaceholder("Title").fill("Delete Testing");
+    await page.getByPlaceholder("Author").fill("Juan Pérez");
+    await page.getByPlaceholder("URL").fill("https://delete.com");
+
+    // Submit the form to create the blog
+
+    await page.getByRole("button", { name: "create" }).click();
+
+    // Verify that the new blog appears in the list of blogs
+
+    const blog = page.locator(".blog", {
+      hasText: "Delete Testing",
+    });
+
+    await expect(blog).toBeVisible();
+
+    // Click the button to show blog details
+
+    await blog.getByRole("button", { name: "view" }).click();
+
+    // Set up a listener to handle the confirmation dialog that appears when deleting a blog
+
+    page.once("dialog", async (dialog) => {
+      await dialog.accept();
+    });
+
+    // Click the delete button
+
+    await blog.getByRole("button", { name: "remove" }).click();
+
+    // Verify that the blog has been removed from the list of blogs
+
+    await expect(blog).not.toBeVisible();
+  });
 });
