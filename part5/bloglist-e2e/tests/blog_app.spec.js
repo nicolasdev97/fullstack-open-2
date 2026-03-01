@@ -202,7 +202,8 @@ describe("When logged in", () => {
   });
 
   test("only creator sees the delete button", async ({ page, request }) => {
-    // Crear segundo usuario
+    // Create a second user
+
     await request.post("http://localhost:3003/api/users", {
       data: {
         name: "Otro Usuario",
@@ -211,37 +212,49 @@ describe("When logged in", () => {
       },
     });
 
-    // Crear blog con el usuario actual (juan)
+    // Create a blog with the first user
+
     await createBlog(page, "Blog Privado", "Juan", "url");
 
-    // Cerrar sesión
+    // Logout from the first user
+
     await page.getByRole("button", { name: "logout" }).click();
 
-    // Login con el segundo usuario
+    // Login with the second user
+
     await page.getByPlaceholder("Username").fill("otro");
     await page.getByPlaceholder("Password").fill("12345");
     await page.getByRole("button", { name: "login" }).click();
 
-    // Expandir el blog
+    // Show the details of the blog created by the first user
+
     const blog = page.locator(".blog", { hasText: "Blog Privado" });
 
     await blog.getByRole("button", { name: "view" }).click();
 
-    // 🔥 Verificar que NO existe botón remove
+    // Verify that the delete button is not visible for the second user
+
     await expect(blog.getByRole("button", { name: "remove" })).toHaveCount(0);
   });
 
   test("blogs are ordered according to likes", async ({ page }) => {
+    // Create multiple blogs
+
     await createBlog(page, "Blog 1", "Autor", "url1");
     await createBlog(page, "Blog 2", "Autor", "url2");
     await createBlog(page, "Blog 3", "Autor", "url3");
+
+    // Like the blogs a different number of times
 
     await likeBlog(page, "Blog 1", 2);
     await likeBlog(page, "Blog 2", 5);
     await likeBlog(page, "Blog 3", 1);
 
-    // esperar a que React re-renderice
+    // Wait for the UI to update the order of blogs
+
     await page.waitForTimeout(500);
+
+    // Verify that the blogs are ordered by likes in descending order
 
     const blogs = await page.locator(".blog").allTextContents();
 
