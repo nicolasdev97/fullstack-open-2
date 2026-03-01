@@ -1,5 +1,33 @@
 const { test, expect, beforeEach, describe } = require("@playwright/test");
 
+const createBlog = async (page, title, author, url) => {
+  await page.getByRole("button", { name: "create new blog" }).click();
+
+  await page.getByPlaceholder("Title").fill(title);
+  await page.getByPlaceholder("Author").fill(author);
+  await page.getByPlaceholder("URL").fill(url);
+
+  await page.getByRole("button", { name: "create" }).click();
+
+  await expect(page.locator(".blog", { hasText: title })).toBeVisible();
+};
+
+const likeBlog = async (page, title, times) => {
+  const blog = page.locator(".blog", { hasText: title });
+
+  await blog.waitFor();
+
+  const viewButton = blog.getByRole("button", { name: "view" });
+
+  if ((await viewButton.count()) > 0) {
+    await viewButton.click();
+  }
+
+  for (let i = 0; i < times; i++) {
+    await blog.getByRole("button", { name: "like" }).click();
+  }
+};
+
 beforeEach(async ({ page, request }) => {
   // Clear database
 
@@ -171,5 +199,24 @@ describe("When logged in", () => {
     // Verify that the blog has been removed from the list of blogs
 
     await expect(blog).not.toBeVisible();
+  });
+
+  test("blogs are ordered according to likes", async ({ page }) => {
+    await createBlog(page, "Blog 1", "Autor", "url1");
+    await createBlog(page, "Blog 2", "Autor", "url2");
+    await createBlog(page, "Blog 3", "Autor", "url3");
+
+    await likeBlog(page, "Blog 1", 2);
+    await likeBlog(page, "Blog 2", 5);
+    await likeBlog(page, "Blog 3", 1);
+
+    // esperar a que React re-renderice
+    await page.waitForTimeout(500);
+
+    const blogs = await page.locator(".blog").allTextContents();
+
+    expect(blogs[0]).toContain("Blog 2");
+    expect(blogs[1]).toContain("Blog 1");
+    expect(blogs[2]).toContain("Blog 3");
   });
 });
