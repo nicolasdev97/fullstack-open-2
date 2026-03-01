@@ -1,4 +1,4 @@
-import { test, expect } from "vitest";
+import { test, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Blog from "./Blog";
@@ -61,12 +61,60 @@ test("shows url and likes when view button is clicked", async () => {
   const userSim = userEvent.setup();
 
   // Find the view button
+
   const button = screen.getByText("view");
 
   // Click the view button
+
   await userSim.click(button);
 
   // Check that url and likes are now visible
+
   expect(screen.getByText("https://reacttesting.com")).toBeInTheDocument();
   expect(screen.getByText("likes 10")).toBeInTheDocument();
+});
+
+test("calls event handler twice when like button is clicked twice", async () => {
+  const blog = {
+    title: "React Testing",
+    author: "Juan Pérez",
+    url: "https://reacttesting.com",
+    likes: 10,
+    user: { username: "juan" },
+  };
+
+  const user = { username: "juan" };
+
+  // Mock function to track calls
+
+  const mockHandler = vi.fn();
+
+  render(
+    <Blog
+      blog={blog}
+      user={user}
+      handleLike={mockHandler}
+      handleDelete={() => {}}
+    />,
+  );
+
+  const userSim = userEvent.setup();
+
+  // Click the view button to show the like button
+
+  const viewButton = screen.getByText("view");
+  await userSim.click(viewButton);
+
+  // Find the like button
+
+  const likeButton = screen.getByText("like");
+
+  // Click the like button twice
+
+  await userSim.click(likeButton);
+  await userSim.click(likeButton);
+
+  // Check that the mock handler was called twice
+
+  expect(mockHandler).toHaveBeenCalledTimes(2);
 });
