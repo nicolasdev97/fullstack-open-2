@@ -172,4 +172,34 @@ describe("When logged in", () => {
 
     await expect(blog).not.toBeVisible();
   });
+
+  test("only creator sees the delete button", async ({ page, request }) => {
+    // Crear segundo usuario
+    await request.post("http://localhost:3003/api/users", {
+      data: {
+        name: "Otro Usuario",
+        username: "otro",
+        password: "12345",
+      },
+    });
+
+    // Crear blog con el usuario actual (juan)
+    await createBlog(page, "Blog Privado", "Juan", "url");
+
+    // Cerrar sesión
+    await page.getByRole("button", { name: "logout" }).click();
+
+    // Login con el segundo usuario
+    await page.getByPlaceholder("Username").fill("otro");
+    await page.getByPlaceholder("Password").fill("12345");
+    await page.getByRole("button", { name: "login" }).click();
+
+    // Expandir el blog
+    const blog = page.locator(".blog", { hasText: "Blog Privado" });
+
+    await blog.getByRole("button", { name: "view" }).click();
+
+    // 🔥 Verificar que NO existe botón remove
+    await expect(blog.getByRole("button", { name: "remove" })).toHaveCount(0);
+  });
 });
