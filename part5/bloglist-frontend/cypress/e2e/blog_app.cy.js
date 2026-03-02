@@ -219,4 +219,47 @@ describe("Blog app", function () {
         .should("not.exist");
     });
   });
+
+  describe("When logged in - Order likes", function () {
+    beforeEach(function () {
+      // Login
+
+      cy.login({ username: "juan", password: "12345" });
+
+      // Create multiple blogs with different titles
+
+      cy.createBlog({ title: "Blog 1", author: "Autor", url: "url1" });
+      cy.createBlog({ title: "Blog 2", author: "Autor", url: "url2" });
+      cy.createBlog({ title: "Blog 3", author: "Autor", url: "url3" });
+    });
+
+    it("blogs are ordered according to likes", function () {
+      // Like the blogs a different number of times waiting a bit between likes to ensure the backend updates
+      cy.contains("Blog 1").parent().find("button").contains("view").click();
+      cy.contains("Blog 1").parent().contains("like").click();
+      cy.wait(500);
+      cy.contains("Blog 1").parent().contains("like").click();
+      cy.wait(500);
+
+      cy.contains("Blog 2").parent().find("button").contains("view").click();
+      cy.contains("Blog 2").parent().contains("like").click();
+      cy.wait(500);
+      cy.contains("Blog 2").parent().contains("like").click();
+      cy.wait(500);
+      cy.contains("Blog 2").parent().contains("like").click();
+      cy.wait(500);
+      cy.contains("Blog 2").parent().contains("like").click();
+      cy.wait(500);
+      cy.contains("Blog 2").parent().contains("like").click();
+
+      cy.contains("Blog 3").parent().find("button").contains("view").click();
+      cy.contains("Blog 3").parent().contains("like").click();
+      cy.wait(500);
+
+      // Verify that the blogs are ordered by likes (Blog 2 with 5 likes, Blog 1 with 2 likes, Blog 3 with 1 like)
+      cy.get(".blog").eq(0).should("contain", "Blog 2");
+      cy.get(".blog").eq(1).should("contain", "Blog 1");
+      cy.get(".blog").eq(2).should("contain", "Blog 3");
+    });
+  });
 });
