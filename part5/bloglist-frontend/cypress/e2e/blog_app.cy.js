@@ -85,5 +85,44 @@ describe("Blog app", function () {
 
       cy.contains("Cypress Testing Juan Pérez");
     });
+
+    it("A user can like a blog", function () {
+      // Open the form to create a new blog
+
+      cy.contains("create new blog").click();
+
+      // Fill in the form to create a new blog
+
+      cy.get("form").within(() => {
+        cy.get("input[placeholder='Title']").type("Blog to Like");
+        cy.get("input[placeholder='Author']").type("Juan Pérez");
+        cy.get("input[placeholder='URL']").type("https://cypress.io");
+
+        cy.contains("create").click();
+      });
+      // Abrir los detalles del blog
+
+      cy.contains("Blog to Like").parent().contains("view").click();
+
+      // Verify that the blog starts with 0 likes
+
+      cy.contains("likes 0");
+
+      // Click the like button
+
+      cy.contains("Blog to Like").parent().contains("like").click();
+
+      // Verify that the likes have increased to 1
+
+      cy.contains("likes 1");
+
+      // Click the like button again
+
+      cy.contains("Blog to Like").parent().contains("like").click();
+
+      // Verify that the likes have increased to 2
+
+      cy.contains("likes 2");
+    });
   });
 });
