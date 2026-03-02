@@ -124,5 +124,42 @@ describe("Blog app", function () {
 
       cy.contains("likes 2");
     });
+
+    it("A user who created a blog can delete it", function () {
+      // Open the form to create a new blog
+
+      cy.contains("create new blog").click();
+
+      // Fill in the form to create a new blog
+
+      cy.get("form").within(() => {
+        cy.get("input[placeholder='Title']").type("Blog to Delete");
+        cy.get("input[placeholder='Author']").type("Juan Pérez");
+        cy.get("input[placeholder='URL']").type("https://cypress.io");
+
+        cy.contains("create").click();
+      });
+      // Abrir los detalles del blog
+      cy.contains("Blog to Delete")
+        .parent() // Contenedor del blog
+        .contains("view")
+        .click();
+
+      // Verificar que el botón remove sea visible
+      cy.contains("Blog to Delete")
+        .parent()
+        .contains("remove")
+        .should("be.visible");
+
+      // Hacer clic en remove y confirmar
+      cy.contains("Blog to Delete").parent().contains("remove").click();
+
+      // Cypress no necesita el dialogo manual si usas window.confirm por defecto,
+      // si necesitas, puedes stubearlo:
+      cy.on("window:confirm", () => true);
+
+      // Verificar que el blog desapareció
+      cy.contains("Blog to Delete").should("not.exist");
+    });
   });
 });
