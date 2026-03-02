@@ -27,25 +27,63 @@ describe("Blog app", function () {
 
   describe("Login", function () {
     it("succeeds with correct credentials", function () {
-      // llenar formulario
+      // Full login form
+
       cy.get("input[placeholder='Username']").type("juan");
       cy.get("input[placeholder='Password']").type("12345");
       cy.contains("login").click();
 
-      // verificar login
+      // Verify successful login
+
       cy.contains("Juan Pérez logged in");
     });
 
     it("fails with wrong credentials", function () {
-      // llenar formulario con password incorrecto
+      // Full login form with wrong password
+
       cy.get("input[placeholder='Username']").type("juan");
       cy.get("input[placeholder='Password']").type("wrongpassword");
       cy.contains("login").click();
 
-      // verificar mensaje de error
+      // Verify error message
+
       cy.get(".notification")
         .should("contain", "Wrong credentials")
-        .and("have.css", "color", "rgb(255, 0, 0)"); // opcional: color rojo
+        .and("have.css", "color", "rgb(255, 0, 0)");
+    });
+  });
+
+  describe("When logged in", function () {
+    beforeEach(function () {
+      // Log in before each test in this block
+
+      cy.get("input[placeholder='Username']").type("juan");
+      cy.get("input[placeholder='Password']").type("12345");
+      cy.contains("login").click();
+
+      // Verify successful login
+
+      cy.contains("Juan Pérez logged in");
+    });
+
+    it("A blog can be created", function () {
+      // Open the form to create a new blog
+
+      cy.contains("create new blog").click();
+
+      // Fill in the form to create a new blog
+
+      cy.get("form").within(() => {
+        cy.get("input[placeholder='Title']").type("Cypress Testing");
+        cy.get("input[placeholder='Author']").type("Juan Pérez");
+        cy.get("input[placeholder='URL']").type("https://cypress.io");
+
+        cy.contains("create").click();
+      });
+
+      // Verify that the new blog is displayed
+
+      cy.contains("Cypress Testing Juan Pérez");
     });
   });
 });
