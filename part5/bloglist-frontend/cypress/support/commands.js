@@ -23,3 +23,30 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+// comando para login via API
+Cypress.Commands.add("login", ({ username, password }) => {
+  cy.request("POST", "http://localhost:3003/api/login", {
+    username,
+    password,
+  }).then(({ body }) => {
+    localStorage.setItem("loggedBlogappUser", JSON.stringify(body));
+    cy.visit("http://localhost:5173"); // recarga la página para que use el usuario
+  });
+});
+
+// comando para crear un blog via API usando el token del usuario logueado
+Cypress.Commands.add("createBlog", ({ title, author, url, likes = 0 }) => {
+  const user = JSON.parse(localStorage.getItem("loggedBlogappUser"));
+
+  cy.request({
+    method: "POST",
+    url: "http://localhost:3003/api/blogs",
+    body: { title, author, url, likes },
+    headers: {
+      Authorization: `Bearer ${user.token}`,
+    },
+  });
+
+  cy.visit("http://localhost:5173"); // recarga la página para mostrar el nuevo blog
+});

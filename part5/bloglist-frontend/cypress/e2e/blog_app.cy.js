@@ -162,4 +162,61 @@ describe("Blog app", function () {
       cy.contains("Blog to Delete").should("not.exist");
     });
   });
+
+  describe("Blog app - delete button visibility", function () {
+    beforeEach(function () {
+      // Create a second user for testing
+
+      const user = {
+        name: "Mario Gómez",
+        username: "mario",
+        password: "54321",
+      };
+      cy.request("POST", "http://localhost:3003/api/users", user);
+
+      // Login like the first user and create a blog
+
+      cy.login({ username: "juan", password: "12345" });
+
+      cy.createBlog({
+        title: "Blog Restricted Delete",
+        author: "Juan Pérez",
+        url: "https://restricted.com",
+      });
+    });
+
+    it("Creator can see the delete button", function () {
+      // Open the details of the blog created by the first user
+
+      cy.contains("Blog Restricted Delete").parent().contains("view").click();
+
+      // Verify that the remove button is visible for the creator
+
+      cy.contains("Blog Restricted Delete")
+        .parent()
+        .contains("remove")
+        .should("be.visible");
+    });
+
+    it("Other users cannot see the delete button", function () {
+      // Logout the first user
+
+      cy.contains("logout").click();
+
+      // Login with the second user
+
+      cy.login({ username: "mario", password: "54321" });
+
+      // Open the details of the blog created by the first user
+
+      cy.contains("Blog Restricted Delete").parent().contains("view").click();
+
+      // Verify that the remove button is not visible for other users
+
+      cy.contains("Blog Restricted Delete")
+        .parent()
+        .contains("remove")
+        .should("not.exist");
+    });
+  });
 });
