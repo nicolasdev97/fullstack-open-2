@@ -39,4 +39,9 @@ export default [
       "no-console": "off",
     },
   },
+  {
+    "env": {
+      "cypress/globals": true,
+    },
+  },
 ];
