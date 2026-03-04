@@ -34,6 +34,11 @@
       "id": "e0dc",
       "content": "Example.",
       "votes": 1
+    },
+    {
+      "id": "b461",
+      "content": "Example 1.",
+      "votes": 5
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
