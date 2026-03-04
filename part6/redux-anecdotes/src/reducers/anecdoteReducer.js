@@ -8,30 +8,50 @@ const anecdoteSlice = createSlice({
       return action.payload;
     },
 
+    appendAnecdote(state, action) {
+      state.push(action.payload);
+    },
+
     voteAnecdote(state, action) {
       const id = action.payload;
       const anecdote = state.find((a) => a.id === id);
       anecdote.votes += 1;
     },
-
-    createAnecdote: {
-      reducer(state, action) {
-        state.push(action.payload);
-      },
-      prepare(content) {
-        return {
-          payload: {
-            content,
-            id: (Math.random() * 1000000).toFixed(0),
-            votes: 0,
-          },
-        };
-      },
-    },
   },
 });
 
-export const { setAnecdotes, voteAnecdote, createAnecdote } =
+export const { setAnecdotes, appendAnecdote, voteAnecdote } =
   anecdoteSlice.actions;
 
 export default anecdoteSlice.reducer;
+
+// Thunks
+
+export const initializeAnecdotes = () => {
+  return async (dispatch) => {
+    const response = await fetch("http://localhost:3001/anecdotes");
+    const data = await response.json();
+    dispatch(setAnecdotes(data));
+  };
+};
+
+export const createAnecdote = (content) => {
+  return async (dispatch) => {
+    const newAnecdote = {
+      content,
+      votes: 0,
+    };
+
+    const response = await fetch("http://localhost:3001/anecdotes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newAnecdote),
+    });
+
+    const data = await response.json();
+
+    dispatch(appendAnecdote(data));
+  };
+};
