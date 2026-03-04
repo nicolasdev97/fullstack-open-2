@@ -9,17 +9,20 @@ const AnecdoteForm = () => {
     const content = event.target.anecdote.value;
     event.target.anecdote.value = "";
 
-    dispatch(createAnecdote(content));
+    dispatch(
+      createAnecdote({
+        content,
+        id: (Math.random() * 1000000).toFixed(0),
+        votes: 0,
+      }),
+    );
   };
 
   return (
-    <div>
-      <h2>create new</h2>
-      <form onSubmit={addAnecdote}>
-        <input name="anecdote" />
-        <button type="submit">create</button>
-      </form>
-    </div>
+    <form onSubmit={addAnecdote}>
+      <input name="anecdote" />
+      <button type="submit">create</button>
+    </form>
   );
 };
 
