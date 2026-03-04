@@ -1,8 +1,16 @@
 import { useSelector, useDispatch } from "react-redux";
 import { voteAnecdote } from "../reducers/anecdoteReducer";
 import { setNotificationWithTimeout } from "../reducers/notificationReducer";
+import { useEffect } from "react";
+import { initializeAnecdotes } from "../reducers/anecdoteReducer";
 
 const AnecdoteList = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(initializeAnecdotes());
+  }, [dispatch]);
+
   const anecdotes = useSelector((state) => {
     const filter = state.filter.toLowerCase();
 
@@ -10,8 +18,6 @@ const AnecdoteList = () => {
       .filter((anecdote) => anecdote.content.toLowerCase().includes(filter))
       .sort((a, b) => b.votes - a.votes);
   });
-
-  const dispatch = useDispatch();
 
   return (
     <div>
