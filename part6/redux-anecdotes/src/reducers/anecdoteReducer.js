@@ -12,15 +12,16 @@ const anecdoteSlice = createSlice({
       state.push(action.payload);
     },
 
-    voteAnecdote(state, action) {
-      const id = action.payload;
-      const anecdote = state.find((a) => a.id === id);
-      anecdote.votes += 1;
+    updateAnecdote(state, action) {
+      const updated = action.payload;
+      return state.map((anecdote) =>
+        anecdote.id === updated.id ? updated : anecdote,
+      );
     },
   },
 });
 
-export const { setAnecdotes, appendAnecdote, voteAnecdote } =
+export const { setAnecdotes, appendAnecdote, updateAnecdote } =
   anecdoteSlice.actions;
 
 export default anecdoteSlice.reducer;
@@ -44,14 +45,36 @@ export const createAnecdote = (content) => {
 
     const response = await fetch("http://localhost:3001/anecdotes", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newAnecdote),
     });
 
     const data = await response.json();
 
     dispatch(appendAnecdote(data));
+  };
+};
+
+export const voteAnecdote = (anecdote) => {
+  return async (dispatch) => {
+    const updatedAnecdote = {
+      ...anecdote,
+      votes: anecdote.votes + 1,
+    };
+
+    const response = await fetch(
+      `http://localhost:3001/anecdotes/${anecdote.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedAnecdote),
+      },
+    );
+
+    const data = await response.json();
+
+    dispatch(updateAnecdote(data));
   };
 };

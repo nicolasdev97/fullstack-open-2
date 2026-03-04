@@ -10,13 +10,7 @@ const AnecdoteForm = () => {
     const content = event.target.anecdote.value;
     event.target.anecdote.value = "";
 
-    dispatch(
-      createAnecdote({
-        content,
-        id: (Math.random() * 1000000).toFixed(0),
-        votes: 0,
-      }),
-    );
+    dispatch(createAnecdote(content));
 
     dispatch(setNotificationWithTimeout(`You created '${content}'`, 5));
   };
