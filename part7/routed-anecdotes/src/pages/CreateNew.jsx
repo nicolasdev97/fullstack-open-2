@@ -19,7 +19,17 @@ const CreateNew = ({ addNew }) => {
       votes: 0,
     });
 
+    content.reset();
+    author.reset();
+    info.reset();
+
     navigate("/");
+  };
+
+  const handleReset = () => {
+    content.reset();
+    author.reset();
+    info.reset();
   };
 
   return (
@@ -43,6 +53,9 @@ const CreateNew = ({ addNew }) => {
         </div>
 
         <button>create</button>
+        <button type="button" onClick={handleReset}>
+          reset
+        </button>
       </form>
     </div>
   );
