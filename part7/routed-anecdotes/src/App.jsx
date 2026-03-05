@@ -5,6 +5,7 @@ import Menu from "./components/Menu";
 import Footer from "./components/Footer";
 
 import AnecdoteList from "./pages/AnecdoteList";
+import Anecdote from "./pages/Anecdote";
 import About from "./pages/About";
 import CreateNew from "./pages/CreateNew";
 
@@ -43,6 +44,10 @@ const App = () => {
 
       <Routes>
         <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
+        <Route
+          path="/anecdotes/:id"
+          element={<Anecdote anecdotes={anecdotes} />}
+        />
         <Route path="/create" element={<CreateNew addNew={addNew} />} />
         <Route path="/about" element={<About />} />
       </Routes>
