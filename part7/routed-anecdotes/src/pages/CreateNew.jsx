@@ -9,27 +9,29 @@ const CreateNew = ({ addNew }) => {
   const author = useField("text");
   const info = useField("text");
 
+  const { reset: resetContent, ...contentProps } = content;
+  const { reset: resetAuthor, ...authorProps } = author;
+  const { reset: resetInfo, ...infoProps } = info;
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
     addNew({
-      content,
-      author,
-      info,
+      content: content.value,
+      author: author.value,
+      info: info.value,
       votes: 0,
     });
 
-    content.reset();
-    author.reset();
-    info.reset();
+    handleReset();
 
     navigate("/");
   };
 
   const handleReset = () => {
-    content.reset();
-    author.reset();
-    info.reset();
+    resetContent();
+    resetAuthor();
+    resetInfo();
   };
 
   return (
@@ -39,17 +41,17 @@ const CreateNew = ({ addNew }) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input {...content} />
+          <input {...contentProps} />
         </div>
 
         <div>
           author
-          <input {...author} />
+          <input {...authorProps} />
         </div>
 
         <div>
           url for more info
-          <input {...info} />
+          <input {...infoProps} />
         </div>
 
         <button>create</button>
