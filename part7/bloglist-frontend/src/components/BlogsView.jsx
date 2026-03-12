@@ -1,7 +1,7 @@
-import Blog from "./Blog";
+import Blog from "./Blog"
 
 const BlogsView = ({ blogs, user, handleLike, handleDelete }) => {
-  const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes);
+  const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
 
   return (
     <div>
@@ -15,7 +15,7 @@ const BlogsView = ({ blogs, user, handleLike, handleDelete }) => {
         />
       ))}
     </div>
-  );
-};
+  )
+}
 
-export default BlogsView;
+export default BlogsView

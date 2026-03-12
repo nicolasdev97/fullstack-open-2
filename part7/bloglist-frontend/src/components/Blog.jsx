@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState } from "react"
 
 const Blog = ({ blog, user, handleLike, handleDelete }) => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
 
   const toggleVisibility = () => {
-    setVisible(!visible);
-  };
+    setVisible(!visible)
+  }
 
   const blogStyle = {
     paddingTop: 10,
@@ -13,7 +13,7 @@ const Blog = ({ blog, user, handleLike, handleDelete }) => {
     border: "solid",
     borderWidth: 1,
     marginBottom: 5,
-  };
+  }
 
   return (
     <div style={blogStyle} className="blog">
@@ -35,7 +35,7 @@ const Blog = ({ blog, user, handleLike, handleDelete }) => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Blog;
+export default Blog

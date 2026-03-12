@@ -1,7 +1,7 @@
-import { test, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import Blog from "./Blog";
+import { test, expect, vi } from "vitest"
+import { render, screen } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
+import Blog from "./Blog"
 
 test("renders title and author but not url or likes by default", () => {
   const blog = {
@@ -10,9 +10,9 @@ test("renders title and author but not url or likes by default", () => {
     url: "https://reacttesting.com",
     likes: 10,
     user: { username: "juan" },
-  };
+  }
 
-  const user = { username: "juan" };
+  const user = { username: "juan" }
 
   const { container } = render(
     <Blog
@@ -20,23 +20,23 @@ test("renders title and author but not url or likes by default", () => {
       user={user}
       handleLike={() => {}}
       handleDelete={() => {}}
-    />,
-  );
+    />
+  )
 
   // Check that title and author are rendered
 
-  const summary = container.querySelector(".blog-summary");
+  const summary = container.querySelector(".blog-summary")
 
   // Check that url and likes are not rendered
 
-  expect(summary).toHaveTextContent("React Testing");
-  expect(summary).toHaveTextContent("Juan Pérez");
+  expect(summary).toHaveTextContent("React Testing")
+  expect(summary).toHaveTextContent("Juan Pérez")
 
   // Check that url and likes are not visible
 
-  expect(container).not.toHaveTextContent("https://reacttesting.com");
-  expect(container).not.toHaveTextContent("likes 10");
-});
+  expect(container).not.toHaveTextContent("https://reacttesting.com")
+  expect(container).not.toHaveTextContent("likes 10")
+})
 
 test("shows url and likes when view button is clicked", async () => {
   const blog = {
@@ -45,9 +45,9 @@ test("shows url and likes when view button is clicked", async () => {
     url: "https://reacttesting.com",
     likes: 10,
     user: { username: "juan" },
-  };
+  }
 
-  const user = { username: "juan" };
+  const user = { username: "juan" }
 
   render(
     <Blog
@@ -55,24 +55,24 @@ test("shows url and likes when view button is clicked", async () => {
       user={user}
       handleLike={() => {}}
       handleDelete={() => {}}
-    />,
-  );
+    />
+  )
 
-  const userSim = userEvent.setup();
+  const userSim = userEvent.setup()
 
   // Find the view button
 
-  const button = screen.getByText("view");
+  const button = screen.getByText("view")
 
   // Click the view button
 
-  await userSim.click(button);
+  await userSim.click(button)
 
   // Check that url and likes are now visible
 
-  expect(screen.getByText("https://reacttesting.com")).toBeInTheDocument();
-  expect(screen.getByText("likes 10")).toBeInTheDocument();
-});
+  expect(screen.getByText("https://reacttesting.com")).toBeInTheDocument()
+  expect(screen.getByText("likes 10")).toBeInTheDocument()
+})
 
 test("calls event handler twice when like button is clicked twice", async () => {
   const blog = {
@@ -81,13 +81,13 @@ test("calls event handler twice when like button is clicked twice", async () => 
     url: "https://reacttesting.com",
     likes: 10,
     user: { username: "juan" },
-  };
+  }
 
-  const user = { username: "juan" };
+  const user = { username: "juan" }
 
   // Mock function to track calls
 
-  const mockHandler = vi.fn();
+  const mockHandler = vi.fn()
 
   render(
     <Blog
@@ -95,26 +95,26 @@ test("calls event handler twice when like button is clicked twice", async () => 
       user={user}
       handleLike={mockHandler}
       handleDelete={() => {}}
-    />,
-  );
+    />
+  )
 
-  const userSim = userEvent.setup();
+  const userSim = userEvent.setup()
 
   // Click the view button to show the like button
 
-  const viewButton = screen.getByText("view");
-  await userSim.click(viewButton);
+  const viewButton = screen.getByText("view")
+  await userSim.click(viewButton)
 
   // Find the like button
 
-  const likeButton = screen.getByText("like");
+  const likeButton = screen.getByText("like")
 
   // Click the like button twice
 
-  await userSim.click(likeButton);
-  await userSim.click(likeButton);
+  await userSim.click(likeButton)
+  await userSim.click(likeButton)
 
   // Check that the mock handler was called twice
 
-  expect(mockHandler).toHaveBeenCalledTimes(2);
-});
+  expect(mockHandler).toHaveBeenCalledTimes(2)
+})

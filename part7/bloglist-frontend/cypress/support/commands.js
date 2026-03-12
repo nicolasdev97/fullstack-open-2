@@ -30,14 +30,14 @@ Cypress.Commands.add("login", ({ username, password }) => {
     username,
     password,
   }).then(({ body }) => {
-    localStorage.setItem("loggedBlogappUser", JSON.stringify(body));
-    cy.visit("http://localhost:5173"); // recarga la página para que use el usuario
-  });
-});
+    localStorage.setItem("loggedBlogappUser", JSON.stringify(body))
+    cy.visit("http://localhost:5173") // recarga la página para que use el usuario
+  })
+})
 
 // comando para crear un blog via API usando el token del usuario logueado
 Cypress.Commands.add("createBlog", ({ title, author, url, likes = 0 }) => {
-  const user = JSON.parse(localStorage.getItem("loggedBlogappUser"));
+  const user = JSON.parse(localStorage.getItem("loggedBlogappUser"))
 
   cy.request({
     method: "POST",
@@ -46,7 +46,7 @@ Cypress.Commands.add("createBlog", ({ title, author, url, likes = 0 }) => {
     headers: {
       Authorization: `Bearer ${user.token}`,
     },
-  });
+  })
 
-  cy.visit("http://localhost:5173"); // recarga la página para mostrar el nuevo blog
-});
+  cy.visit("http://localhost:5173") // recarga la página para mostrar el nuevo blog
+})
