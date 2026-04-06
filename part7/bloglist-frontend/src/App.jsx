@@ -9,14 +9,13 @@ import Togglable from "./components/Togglable"
 import blogService from "./services/blogs"
 import loginService from "./services/login"
 
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import {
   setNotification,
   clearNotification,
 } from "./reducers/notificationReducer"
 
-import { initializeBlogs } from "./reducers/blogReducer"
-import { useSelector } from "react-redux"
+import { initializeBlogs, likeBlog, deleteBlog } from "./reducers/blogReducer"
 
 import { createBlog } from "./reducers/blogReducer"
 
@@ -104,33 +103,16 @@ const App = () => {
 
   // Like a blog
 
-  const handleLike = async (blog) => {
-    const updatedBlog = {
-      ...blog,
-      likes: blog.likes + 1,
-      user: blog.user.id,
-    }
-
-    const returnedBlog = await blogService.update(blog.id, updatedBlog)
-
-    setBlogs(
-      blogs.map((b) =>
-        b.id === blog.id ? { ...returnedBlog, user: blog.user } : b
-      )
-    )
+  const handleLike = (blog) => {
+    dispatch(likeBlog(blog))
   }
 
   // Delete a blog
 
-  const handleDelete = async (blog) => {
-    const confirmDelete = window.confirm(
-      `Remove blog ${blog.title} by ${blog.author}?`
-    )
-
-    if (!confirmDelete) return
-
-    await blogService.remove(blog.id)
-    setBlogs(blogs.filter((b) => b.id !== blog.id))
+  const handleDelete = (blog) => {
+    if (window.confirm(`Remove blog ${blog.title}?`)) {
+      dispatch(deleteBlog(blog.id))
+    }
   }
 
   let content = null
