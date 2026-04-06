@@ -9,13 +9,19 @@ import Togglable from "./components/Togglable"
 import blogService from "./services/blogs"
 import loginService from "./services/login"
 
+import { useDispatch } from "react-redux"
+import {
+  setNotification,
+  clearNotification,
+} from "./reducers/notificationReducer"
+
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [user, setUser] = useState(null)
 
-  const [notification, setNotification] = useState(null)
+  const dispatch = useDispatch()
 
   const blogFormRef = useRef()
 
@@ -28,10 +34,10 @@ const App = () => {
   // Show notification
 
   const showNotification = (message, type) => {
-    setNotification({ message, type })
+    dispatch(setNotification({ message, type }))
 
     setTimeout(() => {
-      setNotification(null)
+      dispatch(clearNotification())
     }, 5000)
   }
 
@@ -158,7 +164,7 @@ const App = () => {
 
   return (
     <div>
-      <Notification notification={notification} />
+      <Notification />
       {content}
     </div>
   )
