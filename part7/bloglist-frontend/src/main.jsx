@@ -8,3 +8,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <App />
   </Provider>
 )
+
+// User credentials for testing:
+// user: juan
+// password: 12345
