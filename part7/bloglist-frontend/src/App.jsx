@@ -15,8 +15,13 @@ import {
   clearNotification,
 } from "./reducers/notificationReducer"
 
+import { initializeBlogs } from "./reducers/blogReducer"
+import { useSelector } from "react-redux"
+
+import { createBlog } from "./reducers/blogReducer"
+
 const App = () => {
-  const [blogs, setBlogs] = useState([])
+  const blogs = useSelector((state) => state.blogs)
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [user, setUser] = useState(null)
@@ -28,7 +33,7 @@ const App = () => {
   // Get all blogs
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
+    dispatch(initializeBlogs())
   }, [])
 
   // Show notification
@@ -82,14 +87,12 @@ const App = () => {
 
   // Add new blog
 
-  const createBlog = async (blogObject) => {
+  const addBlog = async (blogObject) => {
     try {
-      const returnedBlog = await blogService.create(blogObject)
-
-      setBlogs(blogs.concat(returnedBlog))
+      await dispatch(createBlog(blogObject))
 
       showNotification(
-        `A new blog "${returnedBlog.title}" by ${returnedBlog.author} added`,
+        `A new blog "${blogObject.title}" by ${blogObject.author} added`,
         "success"
       )
 
@@ -149,7 +152,7 @@ const App = () => {
         <p>{user.name} logged in</p>
         <button onClick={handleLogout}>logout</button>
         <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-          <AddBlogForm createBlog={createBlog} />
+          <AddBlogForm createBlog={addBlog} />
         </Togglable>
 
         <BlogsView
