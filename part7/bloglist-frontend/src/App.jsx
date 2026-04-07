@@ -15,15 +15,20 @@ import {
   clearNotification,
 } from "./reducers/notificationReducer"
 
-import { initializeBlogs, likeBlog, deleteBlog } from "./reducers/blogReducer"
+import {
+  initializeBlogs,
+  likeBlog,
+  deleteBlog,
+  createBlog,
+} from "./reducers/blogReducer"
 
-import { createBlog } from "./reducers/blogReducer"
+import { initializeUser, loginUser, clearUser } from "./reducers/userReducer"
 
 const App = () => {
   const blogs = useSelector((state) => state.blogs)
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  const [user, setUser] = useState(null)
+  const user = useSelector((state) => state.user)
 
   const dispatch = useDispatch()
 
@@ -48,13 +53,7 @@ const App = () => {
   // Check if user is logged in
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser")
-
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
-    }
+    dispatch(initializeUser())
   }, [])
 
   // Login
@@ -63,14 +62,14 @@ const App = () => {
     event.preventDefault()
 
     try {
-      const user = await loginService.login({ username, password })
+      await dispatch(
+        loginUser({
+          username,
+          password,
+        })
+      )
 
-      window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user))
-
-      blogService.setToken(user.token)
-      setUser(user)
-
-      showNotification(`Welcome ${user.name}`, "success")
+      showNotification(`Welcome ${username}`, "success")
     } catch {
       showNotification("Wrong credentials", "error")
     }
@@ -79,9 +78,8 @@ const App = () => {
   // Logout
 
   const handleLogout = () => {
-    window.localStorage.removeItem("loggedBlogappUser")
-    blogService.setToken(null)
-    setUser(null)
+    window.localStorage.removeItem("loggedBlogAppUser")
+    dispatch(clearUser())
   }
 
   // Add new blog
