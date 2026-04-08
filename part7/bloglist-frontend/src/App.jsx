@@ -31,6 +31,8 @@ const App = () => {
   const blogs = useBlogStore((state) => state.blogs)
   const fetchBlogs = useBlogStore((state) => state.fetchBlogs)
   const createBlog = useBlogStore((state) => state.createBlog)
+  const likeBlog = useBlogStore((state) => state.likeBlog)
+  const deleteBlog = useBlogStore((state) => state.deleteBlog)
 
   const dispatch = useDispatch()
 
@@ -98,14 +100,14 @@ const App = () => {
   // Like a blog
 
   const handleLike = (blog) => {
-    dispatch(likeBlog(blog))
+    likeBlog(blog)
   }
 
   // Delete a blog
 
   const handleDelete = (blog) => {
     if (window.confirm(`Remove blog ${blog.title}?`)) {
-      dispatch(deleteBlog(blog.id))
+      deleteBlog(blog.id)
     }
   }
 
