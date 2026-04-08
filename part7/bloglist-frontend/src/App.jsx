@@ -10,10 +10,7 @@ import blogService from "./services/blogs"
 import loginService from "./services/login"
 
 import { useDispatch, useSelector } from "react-redux"
-import {
-  setNotification,
-  clearNotification,
-} from "./reducers/notificationReducer"
+import useNotificationStore from "./stores/notificationStore"
 
 import {
   initializeBlogs,
@@ -42,13 +39,7 @@ const App = () => {
 
   // Show notification
 
-  const showNotification = (message, type) => {
-    dispatch(setNotification({ message, type }))
-
-    setTimeout(() => {
-      dispatch(clearNotification())
-    }, 5000)
-  }
+  const setNotification = useNotificationStore((state) => state.setNotification)
 
   // Check if user is logged in
 
@@ -69,9 +60,9 @@ const App = () => {
         })
       )
 
-      showNotification(`Welcome ${username}`, "success")
+      setNotification(`Welcome ${username}`, "success", 5)
     } catch {
-      showNotification("Wrong credentials", "error")
+      setNotification("Wrong credentials", "error", 5)
     }
   }
 
@@ -88,14 +79,14 @@ const App = () => {
     try {
       await dispatch(createBlog(blogObject))
 
-      showNotification(
+      setNotification(
         `A new blog "${blogObject.title}" by ${blogObject.author} added`,
         "success"
       )
 
       blogFormRef.current.toggleVisibility()
     } catch {
-      showNotification("Error creating blog", "error")
+      setNotification("Error creating blog", "error")
     }
   }
 

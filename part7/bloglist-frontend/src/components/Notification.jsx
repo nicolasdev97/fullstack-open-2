@@ -1,11 +1,9 @@
-import { useSelector } from "react-redux"
+import useNotificationStore from "../stores/notificationStore"
 
 const Notification = () => {
-  const notification = useSelector((state) => state.notification)
+  const notification = useNotificationStore((state) => state.notification)
 
-  if (!notification) {
-    return null
-  }
+  if (!notification) return null
 
   const style = {
     color: notification.type === "error" ? "red" : "green",
