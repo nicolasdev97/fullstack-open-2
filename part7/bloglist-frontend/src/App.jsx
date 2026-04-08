@@ -14,25 +14,25 @@ import useNotificationStore from "./stores/notificationStore"
 
 import useBlogStore from "./stores/blogStore"
 
-import {
-  initializeBlogs,
-  likeBlog,
-  deleteBlog,
-  createBlog,
-} from "./reducers/blogReducer"
+import useUserStore from "./stores/userStore"
 
 import { initializeUser, loginUser, clearUser } from "./reducers/userReducer"
 
 const App = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  const user = useSelector((state) => state.user)
 
   const blogs = useBlogStore((state) => state.blogs)
   const fetchBlogs = useBlogStore((state) => state.fetchBlogs)
   const createBlog = useBlogStore((state) => state.createBlog)
   const likeBlog = useBlogStore((state) => state.likeBlog)
   const deleteBlog = useBlogStore((state) => state.deleteBlog)
+
+  const loadUser = useUserStore((state) => state.loadUser)
+  const login = useUserStore((state) => state.login)
+  const logout = useUserStore((state) => state.logout)
+
+  const user = useUserStore((state) => state.user)
 
   const dispatch = useDispatch()
 
@@ -51,7 +51,7 @@ const App = () => {
   // Check if user is logged in
 
   useEffect(() => {
-    dispatch(initializeUser())
+    loadUser()
   }, [])
 
   // Login
@@ -60,12 +60,10 @@ const App = () => {
     event.preventDefault()
 
     try {
-      await dispatch(
-        loginUser({
-          username,
-          password,
-        })
-      )
+      await login({
+        username,
+        password,
+      })
 
       setNotification(`Welcome ${username}`, "success", 5)
     } catch {
@@ -77,7 +75,7 @@ const App = () => {
 
   const handleLogout = () => {
     window.localStorage.removeItem("loggedBlogAppUser")
-    dispatch(clearUser())
+    logout()
   }
 
   // Add new blog
