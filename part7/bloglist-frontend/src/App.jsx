@@ -12,6 +12,8 @@ import loginService from "./services/login"
 import { useDispatch, useSelector } from "react-redux"
 import useNotificationStore from "./stores/notificationStore"
 
+import useBlogStore from "./stores/blogStore"
+
 import {
   initializeBlogs,
   likeBlog,
@@ -22,10 +24,13 @@ import {
 import { initializeUser, loginUser, clearUser } from "./reducers/userReducer"
 
 const App = () => {
-  const blogs = useSelector((state) => state.blogs)
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const user = useSelector((state) => state.user)
+
+  const blogs = useBlogStore((state) => state.blogs)
+  const fetchBlogs = useBlogStore((state) => state.fetchBlogs)
+  const createBlog = useBlogStore((state) => state.createBlog)
 
   const dispatch = useDispatch()
 
@@ -34,7 +39,7 @@ const App = () => {
   // Get all blogs
 
   useEffect(() => {
-    dispatch(initializeBlogs())
+    fetchBlogs()
   }, [])
 
   // Show notification
@@ -77,7 +82,7 @@ const App = () => {
 
   const addBlog = async (blogObject) => {
     try {
-      await dispatch(createBlog(blogObject))
+      await createBlog(blogObject)
 
       setNotification(
         `A new blog "${blogObject.title}" by ${blogObject.author} added`,
