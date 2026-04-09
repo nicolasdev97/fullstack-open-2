@@ -6,24 +6,21 @@ import AddBlogForm from "./components/AddBlogForm"
 import Notification from "./components/Notification"
 import Togglable from "./components/Togglable"
 
+import { useNotification } from "./contexts/NotificationContext"
+import { useQuery } from "@tanstack/react-query"
 import blogService from "./services/blogs"
-import loginService from "./services/login"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
-import { useDispatch, useSelector } from "react-redux"
 import useNotificationStore from "./stores/notificationStore"
 
 import useBlogStore from "./stores/blogStore"
 
 import useUserStore from "./stores/userStore"
 
-import { initializeUser, loginUser, clearUser } from "./reducers/userReducer"
-
 const App = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
 
-  const blogs = useBlogStore((state) => state.blogs)
-  const fetchBlogs = useBlogStore((state) => state.fetchBlogs)
   const createBlog = useBlogStore((state) => state.createBlog)
   const likeBlog = useBlogStore((state) => state.likeBlog)
   const deleteBlog = useBlogStore((state) => state.deleteBlog)
@@ -34,19 +31,28 @@ const App = () => {
 
   const user = useUserStore((state) => state.user)
 
-  const dispatch = useDispatch()
+  const [notification, dispatch] = useNotification()
 
   const blogFormRef = useRef()
 
-  // Get all blogs
+  const queryClient = useQueryClient()
 
-  useEffect(() => {
-    fetchBlogs()
-  }, [])
+  // Refetch blogs after mutation
+
+  queryClient.invalidateQueries({ queryKey: ["blogs"] })
 
   // Show notification
 
-  const setNotification = useNotificationStore((state) => state.setNotification)
+  const showNotification = (message, type = "success", time = 5) => {
+    dispatch({
+      type: "SET_NOTIFICATION",
+      payload: { message, type },
+    })
+
+    setTimeout(() => {
+      dispatch({ type: "CLEAR_NOTIFICATION" })
+    }, time * 1000)
+  }
 
   // Check if user is logged in
 
@@ -65,9 +71,9 @@ const App = () => {
         password,
       })
 
-      setNotification(`Welcome ${username}`, "success", 5)
+      showNotification(`Welcome ${username}`, "success", 5)
     } catch {
-      setNotification("Wrong credentials", "error", 5)
+      showNotification("Wrong credentials", "error", 5)
     }
   }
 
@@ -80,20 +86,28 @@ const App = () => {
 
   // Add new blog
 
-  const addBlog = async (blogObject) => {
-    try {
-      await createBlog(blogObject)
-
-      setNotification(
-        `A new blog "${blogObject.title}" by ${blogObject.author} added`,
-        "success"
-      )
-
-      blogFormRef.current.toggleVisibility()
-    } catch {
-      setNotification("Error creating blog", "error")
-    }
+  const addBlog = (blogObject) => {
+    newBlogMutation.mutate(blogObject)
+    blogFormRef.current.toggleVisibility()
   }
+
+  const newBlogMutation = useMutation({
+    mutationFn: blogService.create,
+    onSuccess: (newBlog) => {
+      const blogs = queryClient.getQueryData(["blogs"])
+
+      queryClient.setQueryData(["blogs"], blogs.concat(newBlog))
+
+      showNotification(
+        `A new blog "${newBlog.title}" by ${newBlog.author} added`,
+        "success",
+        5
+      )
+    },
+    onError: () => {
+      showNotification("Error creating blog", "error", 5)
+    },
+  })
 
   // Like a blog
 
@@ -128,11 +142,10 @@ const App = () => {
         <p>{user.name} logged in</p>
         <button onClick={handleLogout}>logout</button>
         <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-          <AddBlogForm createBlog={addBlog} />
+          <AddBlogForm addBlog={addBlog} />
         </Togglable>
 
         <BlogsView
-          blogs={blogs}
           user={user}
           handleLike={handleLike}
           handleDelete={handleDelete}
