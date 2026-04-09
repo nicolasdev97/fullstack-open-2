@@ -13,8 +13,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   </QueryClientProvider>
 )
 
-// Made with Redux
-
 // User credentials for testing:
 // user: juan
 // password: 12345

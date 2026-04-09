@@ -112,16 +112,47 @@ const App = () => {
   // Like a blog
 
   const handleLike = (blog) => {
-    likeBlog(blog)
+    likeBlogMutation.mutate({
+      id: blog.id,
+      blog: { ...blog, likes: blog.likes + 1 },
+    })
   }
+
+  const likeBlogMutation = useMutation({
+    mutationFn: ({ id, blog }) => blogService.update(id, blog),
+    onSuccess: (updatedBlog) => {
+      const blogs = queryClient.getQueryData(["blogs"])
+
+      queryClient.setQueryData(
+        ["blogs"],
+        blogs.map((b) =>
+          b.id === updatedBlog.id ? { ...updatedBlog, user: b.user } : b
+        )
+      )
+    },
+  })
 
   // Delete a blog
 
   const handleDelete = (blog) => {
     if (window.confirm(`Remove blog ${blog.title}?`)) {
-      deleteBlog(blog.id)
+      deleteBlogMutation.mutate(blog.id)
     }
   }
+
+  const deleteBlogMutation = useMutation({
+    mutationFn: blogService.remove,
+    onSuccess: (deletedId) => {
+      const blogs = queryClient.getQueryData(["blogs"])
+
+      queryClient.setQueryData(
+        ["blogs"],
+        blogs.map((b) =>
+          b.id === deletedId.id ? { ...deletedId, user: b.user } : b
+        )
+      )
+    },
+  })
 
   let content = null
 
