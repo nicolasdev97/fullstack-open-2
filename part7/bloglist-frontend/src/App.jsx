@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+import { useEffect, useRef } from "react"
 
 import LoginForm from "./components/LoginForm"
 import BlogsView from "./components/BlogsView"
@@ -13,14 +13,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import useNotificationStore from "./stores/notificationStore"
 
+import loginService from "./services/login"
+
 import useBlogStore from "./stores/blogStore"
 
 import useUserStore from "./stores/userStore"
+import { useUser } from "./contexts/UserContext"
 
 const App = () => {
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-
   const createBlog = useBlogStore((state) => state.createBlog)
   const likeBlog = useBlogStore((state) => state.likeBlog)
   const deleteBlog = useBlogStore((state) => state.deleteBlog)
@@ -29,17 +29,13 @@ const App = () => {
   const login = useUserStore((state) => state.login)
   const logout = useUserStore((state) => state.logout)
 
-  const user = useUserStore((state) => state.user)
+  const [user, userDispatch] = useUser()
 
   const [notification, dispatch] = useNotification()
 
   const blogFormRef = useRef()
 
   const queryClient = useQueryClient()
-
-  // Refetch blogs after mutation
-
-  queryClient.invalidateQueries({ queryKey: ["blogs"] })
 
   // Show notification
 
@@ -57,31 +53,52 @@ const App = () => {
   // Check if user is logged in
 
   useEffect(() => {
-    loadUser()
+    const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser")
+
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+
+      blogService.setToken(user.token)
+
+      userDispatch({
+        type: "SET_USER",
+        payload: user,
+      })
+    }
   }, [])
 
   // Login
 
-  const handleLogin = async (event) => {
-    event.preventDefault()
-
+  const handleLogin = async ({ username, password }) => {
     try {
-      await login({
+      const user = await loginService.login({
         username,
         password,
       })
 
-      showNotification(`Welcome ${username}`, "success", 5)
-    } catch {
-      showNotification("Wrong credentials", "error", 5)
+      window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user))
+
+      blogService.setToken(user.token)
+
+      userDispatch({
+        type: "SET_USER",
+        payload: user,
+      })
+
+      showNotification(`Welcome ${user.name}`, "success", 5)
+    } catch (error) {
+      showNotification("wrong credentials", "error", 5)
     }
   }
 
   // Logout
 
   const handleLogout = () => {
-    window.localStorage.removeItem("loggedBlogAppUser")
-    logout()
+    window.localStorage.removeItem("loggedBlogappUser")
+
+    userDispatch({
+      type: "CLEAR_USER",
+    })
   }
 
   // Add new blog
@@ -157,15 +174,7 @@ const App = () => {
   let content = null
 
   if (!user) {
-    content = (
-      <LoginForm
-        handleLogin={handleLogin}
-        username={username}
-        setUsername={setUsername}
-        password={password}
-        setPassword={setPassword}
-      />
-    )
+    content = <LoginForm handleLogin={handleLogin} />
   } else {
     content = (
       <div>
