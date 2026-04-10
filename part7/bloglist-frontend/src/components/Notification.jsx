@@ -1,7 +1,7 @@
-import { useNotification } from "../contexts/NotificationContext"
+import useNotificationStore from "../stores/notificationStore"
 
 const Notification = () => {
-  const [notification] = useNotification()
+  const notification = useNotificationStore((state) => state.notification)
 
   if (!notification) return null
 

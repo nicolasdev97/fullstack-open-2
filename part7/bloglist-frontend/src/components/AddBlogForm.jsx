@@ -1,31 +1,44 @@
 import { useState } from "react"
+import useBlogStore from "../stores/blogStore"
+import useNotificationStore from "../stores/notificationStore"
 
-const AddBlogForm = ({ addBlog }) => {
+const AddBlogForm = () => {
+  const createBlog = useBlogStore((state) => state.createBlog)
+  const setNotification = useNotificationStore((state) => state.setNotification)
+
   const [title, setTitle] = useState("")
   const [author, setAuthor] = useState("")
   const [url, setUrl] = useState("")
 
-  const handleSubmit = (event) => {
+  const handleCreateBlog = async (event) => {
     event.preventDefault()
 
-    addBlog({
+    const blogObject = {
       title,
       author,
       url,
-    })
+    }
 
-    setTitle("")
-    setAuthor("")
-    setUrl("")
+    try {
+      await createBlog(blogObject)
+
+      setNotification(`a new blog ${blogObject.title} added`, "success", 5)
+
+      setTitle("")
+      setAuthor("")
+      setUrl("")
+    } catch (error) {
+      setNotification("error creating blog", "error", 5)
+    }
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleCreateBlog}>
       <div>
         title:
         <input
           value={title}
-          onChange={({ target }) => setTitle(target.value)}
+          onChange={(e) => setTitle(e.target.value)}
           placeholder="Title"
         />
       </div>
@@ -34,7 +47,7 @@ const AddBlogForm = ({ addBlog }) => {
         author:
         <input
           value={author}
-          onChange={({ target }) => setAuthor(target.value)}
+          onChange={(e) => setAuthor(e.target.value)}
           placeholder="Author"
         />
       </div>
@@ -43,7 +56,7 @@ const AddBlogForm = ({ addBlog }) => {
         url:
         <input
           value={url}
-          onChange={({ target }) => setUrl(target.value)}
+          onChange={(e) => setUrl(e.target.value)}
           placeholder="URL"
         />
       </div>

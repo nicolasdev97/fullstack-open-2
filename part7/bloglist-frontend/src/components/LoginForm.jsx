@@ -1,39 +1,55 @@
 import { useState } from "react"
 
-const LoginForm = ({ handleLogin }) => {
+import useUserStore from "../stores/userStore"
+import useNotificationStore from "../stores/notificationStore"
+
+const LoginForm = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
 
-  const handleSubmit = (event) => {
+  const login = useUserStore((state) => state.login)
+
+  const setNotification = useNotificationStore((state) => state.setNotification)
+
+  const handleLogin = async (event) => {
     event.preventDefault()
 
-    handleLogin({
-      username,
-      password,
-    })
+    try {
+      await login({
+        username,
+        password,
+      })
 
-    setUsername("")
-    setPassword("")
+      setNotification(`Welcome ${username}`, "success", 5)
+    } catch (error) {
+      setNotification("wrong credentials", "error", 5)
+    }
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        username
-        <input value={username} onChange={(e) => setUsername(e.target.value)} />
-      </div>
-
-      <div>
-        password
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-
-      <button type="submit">login</button>
-    </form>
+    <div>
+      <h2>Log in to application</h2>
+      <form onSubmit={handleLogin}>
+        <div>
+          username
+          <input
+            value={username}
+            onChange={({ target }) => setUsername(target.value)}
+            placeholder="Username"
+          />
+        </div>
+        <div>
+          password
+          <input
+            type="password"
+            value={password}
+            onChange={({ target }) => setPassword(target.value)}
+            placeholder="Password"
+          />
+        </div>
+        <button type="submit">login</button>
+      </form>
+    </div>
   )
 }
 

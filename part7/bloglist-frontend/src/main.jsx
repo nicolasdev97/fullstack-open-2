@@ -16,6 +16,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   </UserContextProvider>
 )
 
+// Made with Zustand
+
 // User credentials for testing:
 // user: juan
 // password: 12345
