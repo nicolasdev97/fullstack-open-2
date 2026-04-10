@@ -2,7 +2,7 @@ import { useState } from "react"
 import useBlogStore from "../stores/blogStore"
 import useNotificationStore from "../stores/notificationStore"
 
-const AddBlogForm = () => {
+const AddBlogForm = ({ blogFormRef }) => {
   const createBlog = useBlogStore((state) => state.createBlog)
   const setNotification = useNotificationStore((state) => state.setNotification)
 
@@ -21,6 +21,8 @@ const AddBlogForm = () => {
 
     try {
       await createBlog(blogObject)
+
+      blogFormRef.current.toggleVisibility()
 
       setNotification(`a new blog ${blogObject.title} added`, "success", 5)
 

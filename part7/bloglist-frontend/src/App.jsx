@@ -55,7 +55,7 @@ const App = () => {
         <p>{user.username} logged in</p>
         <button onClick={handleLogout}>logout</button>
         <Togglable ref={blogFormRef}>
-          <AddBlogForm />
+          <AddBlogForm blogFormRef={blogFormRef} />
         </Togglable>
 
         <BlogsView user={user} />

@@ -12,8 +12,6 @@ const BlogsView = ({ user }) => {
   const likeBlog = useBlogStore((state) => state.likeBlog)
   const deleteBlog = useBlogStore((state) => state.deleteBlog)
 
-  const setNotification = useNotificationStore((state) => state.setNotification)
-
   useEffect(() => {
     fetchBlogs()
   }, [])
