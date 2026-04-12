@@ -1,8 +1,11 @@
 import { useEffect, useRef } from "react"
 
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom"
+
 import LoginForm from "./components/LoginForm"
 import BlogsView from "./components/BlogsView"
 import AddBlogForm from "./components/AddBlogForm"
+import UsersView from "./components/UsersView"
 import Notification from "./components/Notification"
 import Togglable from "./components/Togglable"
 
@@ -50,16 +53,39 @@ const App = () => {
     // If user is logged in, show blogs view and add blog form
 
     content = (
-      <div>
-        <h2>blogs</h2>
-        <p>{user.username} logged in</p>
-        <button onClick={handleLogout}>logout</button>
-        <Togglable ref={blogFormRef}>
-          <AddBlogForm blogFormRef={blogFormRef} />
-        </Togglable>
+      <Router>
+        <div>
+          <Notification />
 
-        <BlogsView user={user} />
-      </div>
+          <div>
+            <Link to="/">home</Link> <Link to="/users">users</Link>
+          </div>
+
+          <p>
+            {user.username} logged in
+            <button onClick={handleLogout}>logout</button>
+          </p>
+
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <div>
+                  <h2>blogs</h2>
+
+                  <Togglable ref={blogFormRef}>
+                    <AddBlogForm blogFormRef={blogFormRef} />
+                  </Togglable>
+
+                  <BlogsView />
+                </div>
+              }
+            />
+
+            <Route path="/users" element={<UsersView />} />
+          </Routes>
+        </div>
+      </Router>
     )
   }
 

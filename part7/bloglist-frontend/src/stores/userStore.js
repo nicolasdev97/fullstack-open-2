@@ -1,9 +1,18 @@
 import { create } from "zustand"
 import loginService from "../services/login"
 import blogService from "../services/blogs"
+import userService from "../services/users"
 
 const useUserStore = create((set) => ({
   user: null,
+  users: [],
+
+  setUser: (user) => set({ user }),
+
+  fetchUsers: async () => {
+    const users = await userService.getAll()
+    set({ users })
+  },
 
   login: async (credentials) => {
     const user = await loginService.login(credentials)
