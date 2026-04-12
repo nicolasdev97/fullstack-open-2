@@ -6,6 +6,7 @@ import LoginForm from "./components/LoginForm"
 import BlogsView from "./components/BlogsView"
 import AddBlogForm from "./components/AddBlogForm"
 import UsersView from "./components/UsersView"
+import UserView from "./components/UserView"
 import Notification from "./components/Notification"
 import Togglable from "./components/Togglable"
 
@@ -55,8 +56,6 @@ const App = () => {
     content = (
       <Router>
         <div>
-          <Notification />
-
           <div>
             <Link to="/">home</Link> <Link to="/users">users</Link>
           </div>
@@ -83,6 +82,7 @@ const App = () => {
             />
 
             <Route path="/users" element={<UsersView />} />
+            <Route path="/users/:id" element={<UserView />} />
           </Routes>
         </div>
       </Router>

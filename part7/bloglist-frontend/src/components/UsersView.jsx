@@ -1,4 +1,5 @@
 import { useEffect } from "react"
+import { Link } from "react-router-dom"
 import useUserStore from "../stores/userStore"
 
 const UsersView = () => {
@@ -14,17 +15,17 @@ const UsersView = () => {
       <h2>Users</h2>
 
       <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>blogs created</th>
-          </tr>
-        </thead>
-
         <tbody>
+          <tr>
+            <th>User</th>
+            <th>Blogs created</th>
+          </tr>
+
           {users.map((user) => (
             <tr key={user.id}>
-              <td>{user.name}</td>
+              <td>
+                <Link to={`/users/${user.id}`}>{user.name}</Link>
+              </td>
               <td>{user.blogs.length}</td>
             </tr>
           ))}
