@@ -56,13 +56,13 @@ const App = () => {
       <Router>
         <div>
           <div>
-            <Link to="/">blogs</Link> <Link to="/users">users</Link>
-          </div>
-
-          <p>
+            <Link to="/">blogs</Link>
+            {" | "}
+            <Link to="/users">users</Link>
+            {" | "}
             {user.username} logged in
             <button onClick={handleLogout}>logout</button>
-          </p>
+          </div>
 
           <Routes>
             <Route path="/" element={<Blogs blogFormRef={blogFormRef} />} />
