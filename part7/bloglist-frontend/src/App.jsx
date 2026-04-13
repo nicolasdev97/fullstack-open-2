@@ -3,12 +3,11 @@ import { useEffect, useRef } from "react"
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom"
 
 import LoginForm from "./components/LoginForm"
-import BlogsView from "./components/BlogsView"
-import AddBlogForm from "./components/AddBlogForm"
+import Blogs from "./components/Blogs"
+import BlogDetails from "./components/BlogDetails"
 import UsersView from "./components/UsersView"
 import UserView from "./components/UserView"
 import Notification from "./components/Notification"
-import Togglable from "./components/Togglable"
 
 import useUserStore from "./stores/userStore"
 
@@ -57,7 +56,7 @@ const App = () => {
       <Router>
         <div>
           <div>
-            <Link to="/">home</Link> <Link to="/users">users</Link>
+            <Link to="/">blogs</Link> <Link to="/users">users</Link>
           </div>
 
           <p>
@@ -66,23 +65,10 @@ const App = () => {
           </p>
 
           <Routes>
-            <Route
-              path="/"
-              element={
-                <div>
-                  <h2>blogs</h2>
-
-                  <Togglable ref={blogFormRef}>
-                    <AddBlogForm blogFormRef={blogFormRef} />
-                  </Togglable>
-
-                  <BlogsView />
-                </div>
-              }
-            />
-
+            <Route path="/" element={<Blogs blogFormRef={blogFormRef} />} />
             <Route path="/users" element={<UsersView />} />
             <Route path="/users/:id" element={<UserView />} />
+            <Route path="/blogs/:id" element={<BlogDetails />} />
           </Routes>
         </div>
       </Router>
