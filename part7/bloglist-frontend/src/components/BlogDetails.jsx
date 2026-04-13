@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { useParams } from "react-router-dom"
 import useBlogStore from "../stores/blogStore"
 
@@ -9,6 +10,9 @@ const BlogDetails = () => {
   const likeBlog = useBlogStore((state) => state.likeBlog)
   const deleteBlog = useBlogStore((state) => state.deleteBlog)
 
+  const addComment = useBlogStore((state) => state.addComment)
+  const [comment, setComment] = useState("")
+
   const handleLike = (blog) => {
     likeBlog(blog)
   }
@@ -17,6 +21,14 @@ const BlogDetails = () => {
     if (window.confirm(`Remove blog ${blog.title}?`)) {
       deleteBlog(blog.id)
     }
+  }
+
+  const handleAddComment = async (e) => {
+    e.preventDefault()
+
+    await addComment(blog.id, comment)
+
+    setComment("")
   }
 
   if (!blog) {
@@ -41,6 +53,11 @@ const BlogDetails = () => {
       </div>
 
       <h3>comments</h3>
+
+      <form onSubmit={handleAddComment}>
+        <input value={comment} onChange={(e) => setComment(e.target.value)} />
+        <button type="submit">add comment</button>
+      </form>
 
       <ul>
         {blog.comments?.map((comment, index) => (
