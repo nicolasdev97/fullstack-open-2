@@ -11,6 +11,8 @@ import Notification from "./components/Notification"
 
 import useUserStore from "./stores/userStore"
 
+import "bootstrap/dist/css/bootstrap.min.css"
+
 const App = () => {
   // User state
 
@@ -55,13 +57,22 @@ const App = () => {
     content = (
       <Router>
         <div>
-          <div>
-            <Link to="/">blogs</Link>
+          <div className="navbar navbar-light bg-light px-3">
+            <Link to="/" className="navbar-brand">
+              blogs
+            </Link>
             {" | "}
-            <Link to="/users">users</Link>
+            <Link to="/users" className="navbar-brand">
+              users
+            </Link>
             {" | "}
-            {user.username} logged in
-            <button onClick={handleLogout}>logout</button>
+            <span className="navbar-brand">{user.username} logged in</span>
+            <button
+              onClick={handleLogout}
+              className="btn btn-outline-dark btn-sm ms-2"
+            >
+              logout
+            </button>
           </div>
 
           <Routes>

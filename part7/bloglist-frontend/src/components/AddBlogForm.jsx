@@ -35,35 +35,40 @@ const AddBlogForm = ({ blogFormRef }) => {
   }
 
   return (
-    <form onSubmit={handleCreateBlog}>
-      <div>
+    <form onSubmit={handleCreateBlog} className="mb-4">
+      <div className="mb-3">
         title:
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Title"
+          className="form-control"
         />
       </div>
 
-      <div>
+      <div className="mb-3">
         author:
         <input
           value={author}
           onChange={(e) => setAuthor(e.target.value)}
           placeholder="Author"
+          className="form-control"
         />
       </div>
 
-      <div>
+      <div className="mb-3">
         url:
         <input
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="URL"
+          className="form-control"
         />
       </div>
 
-      <button type="submit">create</button>
+      <button type="submit" className="btn btn-primary">
+        create
+      </button>
     </form>
   )
 }

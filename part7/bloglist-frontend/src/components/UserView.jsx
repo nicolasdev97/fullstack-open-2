@@ -17,9 +17,11 @@ const UserView = () => {
 
       <h3>added blogs</h3>
 
-      <ul>
+      <ul className="list-group list-group-flush">
         {user.blogs.map((blog) => (
-          <li key={blog.id}>{blog.title}</li>
+          <li key={blog.id} className="list-group-item">
+            {blog.title}
+          </li>
         ))}
       </ul>
     </div>

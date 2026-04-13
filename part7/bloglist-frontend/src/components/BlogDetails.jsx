@@ -59,9 +59,11 @@ const BlogDetails = () => {
         <button type="submit">add comment</button>
       </form>
 
-      <ul>
+      <ul className="list-group">
         {blog.comments?.map((comment, index) => (
-          <li key={index}>{comment}</li>
+          <li key={index} className="list-group-item">
+            {comment}
+          </li>
         ))}
       </ul>
     </div>

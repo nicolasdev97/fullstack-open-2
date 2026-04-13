@@ -12,7 +12,7 @@ const BlogsView = ({ user }) => {
   }, [])
 
   return (
-    <div>
+    <div className="container mt-4">
       {sortedBlogs.map((blog) => (
         <Blog key={blog.id} blog={blog} user={user} />
       ))}

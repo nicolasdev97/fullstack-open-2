@@ -8,17 +8,12 @@ const Blog = ({ blog, user, handleLike, handleDelete }) => {
     setVisible(!visible)
   }
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-  }
-
   return (
-    <div style={blogStyle} className="blog">
-      <Link to={`/blogs/${blog.id}`} className="blog-summary">
+    <div className="list-group">
+      <Link
+        to={`/blogs/${blog.id}`}
+        className="list-group-item list-group-item-action"
+      >
         {blog.title} <br /> {blog.author} <br />
         {/* <button onClick={toggleVisibility}>{visible ? "hide" : "view"}</button> */}
       </Link>
