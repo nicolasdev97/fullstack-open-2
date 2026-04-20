@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client/react";
 import { ALL_AUTHORS } from "../graphql/queries";
 import { EDIT_AUTHOR } from "../graphql/mutations";
+import Select from "react-select";
 
 const Authors = () => {
   const { loading, data } = useQuery(ALL_AUTHORS);
@@ -19,16 +20,22 @@ const Authors = () => {
 
   const authors = data.allAuthors;
 
+  const options = authors.map((a) => ({
+    value: a.name,
+    label: a.name,
+  }));
+
   const submit = (event) => {
     event.preventDefault();
 
     editAuthor({
       variables: {
-        name,
+        name: name.value,
         setBornTo: Number(born),
       },
     });
 
+    setName(null);
     setBorn("");
   };
 
@@ -53,25 +60,17 @@ const Authors = () => {
       </table>
       <h3>set birthyear</h3>
       <form onSubmit={submit}>
-        <div>
-          author
-          <select value={name} onChange={({ target }) => setName(target.value)}>
-            <option value="">select author</option>
-            {authors.map((a) => (
-              <option key={a.name} value={a.name}>
-                {a.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          born
-          <input
-            type="number"
-            value={born}
-            onChange={({ target }) => setBorn(target.value)}
-          />
-        </div>
+        <Select
+          options={options}
+          value={name}
+          onChange={(selected) => setName(selected)}
+        />
+
+        <input
+          type="number"
+          value={born}
+          onChange={({ target }) => setBorn(target.value)}
+        />
         <button type="submit">update author</button>
       </form>
     </div>
