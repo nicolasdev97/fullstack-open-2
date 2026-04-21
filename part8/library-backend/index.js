@@ -1,21 +1,9 @@
 import "dotenv/config";
-import mongoose from "mongoose";
 import "./mongo.js";
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import Author from "./models/author.js";
 import Book from "./models/book.js";
-
-const MONGODB_URI = process.env.MONGODB_URI;
-
-mongoose
-  .connect(MONGODB_URI)
-  .then(() => {
-    console.log("connected to MongoDB");
-  })
-  .catch((error) => {
-    console.log("error connecting to MongoDB:", error.message);
-  });
 
 // Schema
 // Defining the structure of the data
@@ -55,6 +43,7 @@ const typeDefs = `
     name: String!
     born: Int
     bookCount: Int!
+    id: ID!
   }
 `;
 
@@ -65,16 +54,20 @@ const resolvers = {
   Query: {
     bookCount: () => books.length,
     authorCount: () => authors.length,
-    allBooks: async () => {
-      return Book.find({});
+    allBooks: async (root, args) => {
+      if (!args.genre) {
+        return Book.find({}).populate("author");
+      }
+
+      return Book.find({ genres: args.genre }).populate("author");
     },
     allAuthors: async () => {
       return Author.find({});
     },
   },
   Author: {
-    bookCount: (root) => {
-      return books.filter((book) => book.author === root.name).length;
+    bookCount: async (root) => {
+      return Book.countDocuments({ author: root._id });
     },
   },
   Mutation: {
@@ -95,17 +88,18 @@ const resolvers = {
 
       await book.save();
 
-      return book;
+      return book.populate("author");
     },
-    editAuthor: (root, args) => {
-      const author = authors.find((a) => a.name === args.name);
+    editAuthor: async (root, args) => {
+      const author = await Author.findOne({ name: args.name });
 
       if (!author) {
         return null;
       }
 
       author.born = args.setBornTo;
-      return author;
+
+      return author.save();
     },
   },
 };
