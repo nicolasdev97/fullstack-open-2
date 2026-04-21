@@ -4,6 +4,7 @@ const schema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
+    minLength: 2,
   },
   published: Number,
   author: {

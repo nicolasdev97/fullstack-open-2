@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 
 const schema = new mongoose.Schema({
-  name: {
+  username: {
     type: String,
     required: true,
-    minLength: 4,
+    unique: true,
   },
-  born: Number,
+  favoriteGenre: String,
 });
 
-export default mongoose.model("Author", schema);
+export default mongoose.model("User", schema);
