@@ -3,7 +3,7 @@ import { useMutation } from "@apollo/client/react";
 import { ADD_BOOK } from "../graphql/mutations";
 import { ALL_BOOKS, ALL_AUTHORS } from "../graphql/queries";
 
-const NewBook = () => {
+const NewBook = ({ show }) => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [published, setPublished] = useState("");
@@ -38,9 +38,9 @@ const NewBook = () => {
     setGenre("");
   };
 
-  // if (!props.show) {
-  //   return null;
-  // }
+  if (!show) {
+    return null;
+  }
 
   return (
     <div>

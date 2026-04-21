@@ -4,7 +4,7 @@ import { ALL_AUTHORS } from "../graphql/queries";
 import { EDIT_AUTHOR } from "../graphql/mutations";
 import Select from "react-select";
 
-const Authors = () => {
+const Authors = ({ show }) => {
   const { loading, data } = useQuery(ALL_AUTHORS);
 
   const [name, setName] = useState("");
@@ -14,7 +14,9 @@ const Authors = () => {
     refetchQueries: [{ query: ALL_AUTHORS }],
   });
 
-  if (loading) {
+  if (!show) {
+    return null;
+  } else if (loading) {
     return <div>loading...</div>;
   }
 
