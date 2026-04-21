@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+// MongoDB connection setup
+
 const MONGODB_URI = process.env.MONGODB_URI;
 
 mongoose.set("strictQuery", false);

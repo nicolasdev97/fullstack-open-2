@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+// Author model for mongodb
+
 const schema = new mongoose.Schema({
   name: {
     type: String,

@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+// Book model for mongodb
+
 const schema = new mongoose.Schema({
   title: {
     type: String,
