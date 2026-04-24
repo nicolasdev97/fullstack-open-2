@@ -10,6 +10,8 @@ const NewBook = ({ show }) => {
   const [genre, setGenre] = useState("");
   const [genres, setGenres] = useState([]);
 
+  // Refetching ALL_BOOKS and ALL_AUTHORS after adding a new book to update the UI
+
   const [addBook] = useMutation(ADD_BOOK, {
     refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
   });
