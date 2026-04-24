@@ -3,8 +3,11 @@ import { ALL_BOOKS } from "../graphql/queries";
 import { useState } from "react";
 
 const Books = ({ show }) => {
-  const { loading, data } = useQuery(ALL_BOOKS);
   const [selectedGenre, setSelectedGenre] = useState(null);
+  const { data: allBooksData } = useQuery(ALL_BOOKS);
+  const { data, loading } = useQuery(ALL_BOOKS, {
+    variables: { genre: selectedGenre },
+  });
 
   if (!show) {
     return null;
@@ -14,13 +17,11 @@ const Books = ({ show }) => {
     return <div>loading...</div>;
   }
 
-  const books = data.allBooks;
+  const books = data?.allBooks || [];
 
-  const genres = [...new Set(books.flatMap((book) => book.genres))];
+  const allBooks = allBooksData?.allBooks || [];
 
-  const filteredBooks = selectedGenre
-    ? books.filter((book) => book.genres.includes(selectedGenre))
-    : books;
+  const genres = [...new Set(allBooks.flatMap((book) => book.genres))];
 
   return (
     <div>
@@ -33,7 +34,7 @@ const Books = ({ show }) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {filteredBooks.map((b) => (
+          {books.map((b) => (
             <tr key={b.title}>
               <td>{b.title}</td>
               <td>{b.author.name}</td>

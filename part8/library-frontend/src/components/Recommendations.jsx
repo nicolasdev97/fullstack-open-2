@@ -17,9 +17,6 @@ const Recommendations = ({ show }) => {
     return <div>loading...</div>;
   }
 
-  console.log("data", userData);
-  console.log("favoriteGenre", favoriteGenre);
-
   return (
     <div>
       <h2>recommendations</h2>
