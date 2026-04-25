@@ -2,6 +2,8 @@ import jwt from "jsonwebtoken";
 
 import { GraphQLError } from "graphql";
 
+import { PubSub } from "graphql-subscriptions";
+
 import User from "../models/user.js";
 import Author from "../models/author.js";
 import Book from "../models/book.js";
@@ -10,11 +12,20 @@ import Book from "../models/book.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+// PubSub instance for subscriptions
+
+const pubsub = new PubSub();
+
 // Resolvers
 // Functions that are responsible for fetching the data for the queries
 // And mutations defined in the schema
 
 const resolvers = {
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator("BOOK_ADDED"),
+    },
+  },
   Query: {
     bookCount: () => books.length,
     authorCount: () => authors.length,
@@ -103,7 +114,13 @@ const resolvers = {
 
           await book.save();
 
-          return book.populate("author");
+          const populatedBook = await book.populate("author");
+
+          pubsub.publish("BOOK_ADDED", {
+            bookAdded: populatedBook,
+          });
+
+          return populatedBook;
         } catch (error) {
           throw new GraphQLError("Saving book failed", {
             extensions: {
