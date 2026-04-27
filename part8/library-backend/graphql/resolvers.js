@@ -39,15 +39,22 @@ const resolvers = {
       return Book.find({ genres: args.genre }).populate("author");
     },
     allAuthors: async () => {
-      return Author.find({});
+      const authors = await Author.find({});
+      const books = await Book.find({});
+
+      return authors.map((author) => {
+        const count = books.filter(
+          (book) => book.author.toString() === author._id.toString(),
+        ).length;
+
+        return {
+          ...author.toObject(),
+          bookCount: count,
+        };
+      });
     },
     me: (root, args, context) => {
       return context.currentUser;
-    },
-  },
-  Author: {
-    bookCount: async (root) => {
-      return Book.countDocuments({ author: root._id });
     },
   },
   Mutation: {
