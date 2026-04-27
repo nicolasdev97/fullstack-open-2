@@ -23,7 +23,9 @@ const pubsub = new PubSub();
 const resolvers = {
   Subscription: {
     bookAdded: {
-      subscribe: () => pubsub.asyncIterator("BOOK_ADDED"),
+      subscribe: () => {
+        return pubsub.asyncIterator("BOOK_ADDED");
+      },
     },
   },
   Query: {
@@ -116,7 +118,7 @@ const resolvers = {
 
           const populatedBook = await book.populate("author");
 
-          pubsub.publish("BOOK_ADDED", {
+          await pubsub.publish("BOOK_ADDED", {
             bookAdded: populatedBook,
           });
 

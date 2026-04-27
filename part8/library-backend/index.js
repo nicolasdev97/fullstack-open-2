@@ -17,52 +17,48 @@ import { createServer } from "http";
 import { WebSocketServer } from "ws";
 import { useServer } from "graphql-ws/use/ws";
 
-// Schema and resolvers, now with access to pubsub in context
-
+// 🔥 1. Crear schema REAL
 const schema = makeExecutableSchema({
   typeDefs,
   resolvers,
 });
 
-// Express application
-
+// 🔥 2. Express
 const app = express();
 
-// HTTP Server (for queries and mutations)
-
+// 🔥 3. HTTP server
 const httpServer = createServer(app);
 
-// WebSocket Server (for subscriptions)
-
+// 🔥 4. WebSocket server (IMPORTANTE path)
 const wsServer = new WebSocketServer({
   server: httpServer,
-  path: "/",
+  path: "/graphql",
 });
 
-// Connect GraphQL WebSocket server to our schema and context
-
-useServer(
+// 🔥 5. Conectar GraphQL WS
+const serverCleanup = useServer(
   {
     schema,
-    context,
+    context: async (ctx) => {
+      const auth = ctx.connectionParams?.authorization;
+
+      return await context({ req: { headers: { authorization: auth } } });
+    },
   },
   wsServer,
 );
 
-// Apollo Server, with context that includes pubsub for subscriptions
-
+// 🔥 6. Apollo Server
 const server = new ApolloServer({
   schema,
 });
 
-// Start Apollo Server
-
+// 🔥 7. Start Apollo
 await server.start();
 
-// Apply Apollo middleware to Express app, with context that includes pubsub for subscriptions
-
+// 🔥 8. Middleware HTTP
 app.use(
-  "/",
+  "/graphql",
   cors(),
   express.json(),
   expressMiddleware(server, {
@@ -70,8 +66,8 @@ app.use(
   }),
 );
 
-// Start the HTTP server and apply Apollo middleware
-
+// 🔥 9. Start server
 httpServer.listen(4000, () => {
-  console.log("Server running on port 4000");
+  console.log("HTTP: http://localhost:4000/graphql");
+  console.log("WS:   ws://localhost:4000/graphql");
 });
