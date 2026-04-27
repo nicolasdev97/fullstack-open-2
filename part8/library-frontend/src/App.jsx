@@ -26,6 +26,10 @@ const App = () => {
     onData: ({ data }) => {
       const addedBook = data.data.bookAdded;
 
+      client.refetchQueries({
+        include: [ALL_BOOKS],
+      });
+
       alert(`Nuevo libro: ${addedBook.title}`);
     },
   });
