@@ -6,3 +6,9 @@ export interface Patient {
   gender: string;
   occupation: string;
 }
+
+export interface Diagnosis {
+  code: string;
+  name: string;
+  latin?: string;
+}
