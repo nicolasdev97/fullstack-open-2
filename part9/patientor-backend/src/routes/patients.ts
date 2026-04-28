@@ -1,5 +1,6 @@
 import express from "express";
 import patientsService from "../services/patientsService";
+import { toNewPatient } from "../utils";
 
 const router = express.Router();
 
@@ -10,8 +11,10 @@ router.get("/", (_req, res) => {
 
 router.post("/", (req, res) => {
   try {
-    const newPatient = patientsService.addPatient(req.body);
-    res.json(newPatient);
+    const newPatient = toNewPatient(req.body); // 👈 validación real
+    const addedPatient = patientsService.addPatient(newPatient);
+
+    res.json(addedPatient);
   } catch (error: unknown) {
     if (error instanceof Error) {
       res.status(400).send(error.message);
