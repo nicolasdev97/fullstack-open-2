@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
+
 import { Weather, type DiaryEntry, Visibility } from "./types";
+
 import { getAllDiaries, createDiary } from "./services/diaryService";
+
+import axios from "axios";
 
 const App = () => {
   const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
@@ -9,6 +13,8 @@ const App = () => {
   const [weather, setWeather] = useState<Weather>(Weather.Sunny);
   const [visibility, setVisibility] = useState<Visibility>(Visibility.Great);
   const [comment, setComment] = useState("");
+
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     getAllDiaries().then((data) => {
@@ -35,8 +41,17 @@ const App = () => {
       setWeather(Weather.Sunny);
       setVisibility(Visibility.Great);
       setComment("");
-    } catch (error) {
-      console.error(error);
+      setErrorMessage(null);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        setErrorMessage(error.response?.data || "Unknown error");
+      } else {
+        setErrorMessage("Unexpected error");
+      }
+
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
     }
   };
 
@@ -45,6 +60,8 @@ const App = () => {
       <h1>Flight Diaries</h1>
 
       <h2>Add new entry</h2>
+
+      {errorMessage && <div style={{ color: "red" }}>{errorMessage}</div>}
 
       <form onSubmit={handleSubmit}>
         <div>
