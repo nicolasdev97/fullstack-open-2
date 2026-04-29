@@ -18,8 +18,8 @@ const isGender = (param: unknown): param is Gender => {
   return Object.values(Gender).includes(param as Gender);
 };
 
-const isObject = (obj: unknown): obj is Record<string, unknown> => {
-  return typeof obj === "object" && obj !== null;
+const isObject = (value: unknown): value is Record<string, unknown> => {
+  return typeof value === "object" && value !== null;
 };
 
 const isHealthCheckRating = (value: number): boolean => {
@@ -132,37 +132,45 @@ export const toNewEntry = (object: unknown): NewEntry => {
 
   switch (object.type) {
     case "Hospital":
-      if (!("discharge" in object)) {
-        throw new Error("Missing discharge");
+      if (!("discharge" in object) || !isObject(object.discharge)) {
+        throw new Error("Invalid or missing discharge");
       }
 
+      const discharge = object.discharge;
+
       return {
-        ...baseEntry,
         type: "Hospital",
+        description: parseStringField(object, "description"),
+        date: parseStringField(object, "date"),
+        specialist: parseStringField(object, "specialist"),
+        diagnosisCodes: parseDiagnosisCodes(object),
         discharge: {
-          date: parseStringField(object.discharge, "date"),
-          criteria: parseStringField(object.discharge, "criteria"),
+          date: parseStringField(discharge, "date"),
+          criteria: parseStringField(discharge, "criteria"),
         },
       };
 
     case "OccupationalHealthcare":
-      if (!isObject(object)) {
-        throw new Error("Invalid object");
+      if (!("employerName" in object)) {
+        throw new Error("Missing employerName");
       }
 
-      const sickLeave = "sickLeave" in object ? object.sickLeave : undefined;
+      const sickLeave =
+        "sickLeave" in object && isObject(object.sickLeave)
+          ? {
+              startDate: parseStringField(object.sickLeave, "startDate"),
+              endDate: parseStringField(object.sickLeave, "endDate"),
+            }
+          : undefined;
 
       return {
-        ...baseEntry,
         type: "OccupationalHealthcare",
+        description: parseStringField(object, "description"),
+        date: parseStringField(object, "date"),
+        specialist: parseStringField(object, "specialist"),
+        diagnosisCodes: parseDiagnosisCodes(object),
         employerName: parseStringField(object, "employerName"),
-        sickLeave:
-          sickLeave && isObject(sickLeave)
-            ? {
-                startDate: parseStringField(sickLeave, "startDate"),
-                endDate: parseStringField(sickLeave, "endDate"),
-              }
-            : undefined,
+        sickLeave,
       };
 
     case "HealthCheck":
@@ -170,10 +178,15 @@ export const toNewEntry = (object: unknown): NewEntry => {
         throw new Error("Missing healthCheckRating");
       }
 
+      const rating = object.healthCheckRating;
+
       return {
-        ...baseEntry,
         type: "HealthCheck",
-        healthCheckRating: parseHealthCheckRating(object.healthCheckRating),
+        description: parseStringField(object, "description"),
+        date: parseStringField(object, "date"),
+        specialist: parseStringField(object, "specialist"),
+        diagnosisCodes: parseDiagnosisCodes(object),
+        healthCheckRating: parseHealthCheckRating(rating),
       };
 
     default:

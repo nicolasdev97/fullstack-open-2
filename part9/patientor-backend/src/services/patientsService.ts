@@ -8,7 +8,10 @@ import {
 } from "../types";
 import { v1 as uuid } from "uuid";
 
-const patients: Patient[] = patientsData;
+const patients: Patient[] = patientsData.map((p) => ({
+  ...p,
+  entries: [...p.entries],
+}));
 
 const getPatients = (): Patient[] => {
   return patientsData;
@@ -45,7 +48,7 @@ const addEntry = (patientId: string, entry: NewEntry): Entry => {
     ...entry,
   };
 
-  patient.entries.push(newEntry);
+  patient.entries = patient.entries.concat(newEntry);
 
   return newEntry;
 };
