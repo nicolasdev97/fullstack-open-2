@@ -1,4 +1,10 @@
-import { NewPatient, Gender, Diagnosis, NewEntry } from "./types";
+import {
+  NewPatient,
+  Gender,
+  Diagnosis,
+  NewEntry,
+  HealthCheckRating,
+} from "./types";
 
 const isString = (text: unknown): text is string => {
   return typeof text === "string" || text instanceof String;
@@ -14,6 +20,10 @@ const isGender = (param: unknown): param is Gender => {
 
 const isObject = (obj: unknown): obj is Record<string, unknown> => {
   return typeof obj === "object" && obj !== null;
+};
+
+const isHealthCheckRating = (value: number): boolean => {
+  return Object.values(HealthCheckRating).includes(value);
 };
 
 const parseName = (name: unknown): string => {
@@ -49,6 +59,14 @@ const parseOccupation = (occupation: unknown): string => {
     throw new Error("Incorrect or missing occupation");
   }
   return occupation;
+};
+
+const parseHealthCheckRating = (value: unknown): number => {
+  if (typeof value !== "number" || !isHealthCheckRating(value)) {
+    throw new Error(`Invalid healthCheckRating: ${value}`);
+  }
+
+  return value;
 };
 
 const parseDiagnosisCodes = (object: unknown): Array<Diagnosis["code"]> => {
@@ -155,7 +173,7 @@ export const toNewEntry = (object: unknown): NewEntry => {
       return {
         ...baseEntry,
         type: "HealthCheck",
-        healthCheckRating: Number(object.healthCheckRating),
+        healthCheckRating: parseHealthCheckRating(object.healthCheckRating),
       };
 
     default:
