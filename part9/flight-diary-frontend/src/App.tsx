@@ -74,31 +74,35 @@ const App = () => {
         </div>
 
         <div>
-          weather
-          <select
-            value={weather}
-            onChange={(e) => setWeather(e.target.value as Weather)}
-          >
-            {Object.values(Weather).map((w) => (
-              <option key={w} value={w}>
-                {w}
-              </option>
-            ))}
-          </select>
+          weather:
+          {Object.values(Weather).map((w) => (
+            <label key={w} style={{ marginLeft: "10px" }}>
+              {w}
+              <input
+                type="radio"
+                name="weather"
+                value={w}
+                checked={weather === w}
+                onChange={() => setWeather(w)}
+              />
+            </label>
+          ))}
         </div>
 
         <div>
-          visibility
-          <select
-            value={visibility}
-            onChange={(e) => setVisibility(e.target.value as Visibility)}
-          >
-            {Object.values(Visibility).map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
-          </select>
+          visibility:
+          {Object.values(Visibility).map((v) => (
+            <label key={v} style={{ marginLeft: "10px" }}>
+              {v}
+              <input
+                type="radio"
+                name="visibility"
+                value={v}
+                checked={visibility === v}
+                onChange={() => setVisibility(v)}
+              />
+            </label>
+          ))}
         </div>
 
         <div>
