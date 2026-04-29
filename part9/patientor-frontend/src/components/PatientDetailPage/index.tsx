@@ -1,13 +1,10 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Diagnosis, Patient } from "../../types";
+import { Patient } from "../../types";
+import EntryDetails from "../EntryDetails";
 
-interface Props {
-  diagnoses: Diagnosis[];
-}
-
-const PatientDetailPage = ({ diagnoses }: Props) => {
+const PatientDetailPage = () => {
   const { id } = useParams<{ id: string }>();
 
   const [patient, setPatient] = useState<Patient | null>(null);
@@ -19,11 +16,6 @@ const PatientDetailPage = ({ diagnoses }: Props) => {
         .then((res) => setPatient(res.data));
     }
   }, [id]);
-
-  const getDiagnosisName = (code: string): string => {
-    const diagnose = diagnoses.find((d) => d.code === code);
-    return diagnose ? diagnose.name : "Unknown diagnosis";
-  };
 
   if (!patient) return <div>Loading...</div>;
 
@@ -48,19 +40,11 @@ const PatientDetailPage = ({ diagnoses }: Props) => {
             padding: "10px",
           }}
         >
-          <p>
-            <strong>{entry.date}</strong>
-          </p>
-
-          <p>{entry.description}</p>
-
-          {entry.diagnosisCodes && (
-            <ul>
-              {entry.diagnosisCodes.map((code) => (
-                <li key={code}>{getDiagnosisName(code)}</li>
-              ))}
-            </ul>
-          )}
+          {patient.entries.map((entry) => (
+            <div key={entry.id}>
+              <EntryDetails entry={entry} />
+            </div>
+          ))}
         </div>
       ))}
     </div>
