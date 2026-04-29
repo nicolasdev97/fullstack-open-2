@@ -1,8 +1,16 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Patient } from "../../types";
+import { Diagnosis, Patient } from "../../types";
 import EntryDetails from "../EntryDetails";
+
+import {
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  OutlinedInput,
+} from "@mui/material";
 
 const PatientDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,6 +36,11 @@ const PatientDetailPage = () => {
   const [sickStart, setSickStart] = useState("");
   const [sickEnd, setSickEnd] = useState("");
 
+  const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([]);
+  const [selectedCodes, setSelectedCodes] = useState<string[]>([]);
+
+  const [open, setOpen] = useState(false);
+
   useEffect(() => {
     if (id) {
       axios
@@ -36,28 +49,43 @@ const PatientDetailPage = () => {
     }
   }, [id]);
 
+  useEffect(() => {
+    axios
+      .get("http://localhost:3001/api/diagnoses")
+      .then((res) => setDiagnoses(res.data));
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!patient?.id) {
+      setError("Patient not found");
+      return;
+    }
+
     let newEntry;
+
+    const baseEntry = {
+      type,
+      description,
+      date,
+      specialist,
+      diagnosisCodes: selectedCodes.length ? selectedCodes : undefined,
+    };
 
     switch (type) {
       case "HealthCheck":
         newEntry = {
-          type,
-          description,
-          date,
-          specialist,
+          ...baseEntry,
+          type: "HealthCheck",
           healthCheckRating,
         };
         break;
 
       case "Hospital":
         newEntry = {
-          type,
-          description,
-          date,
-          specialist,
+          ...baseEntry,
+          type: "Hospital",
           discharge: {
             date: dischargeDate,
             criteria: dischargeCriteria,
@@ -67,10 +95,8 @@ const PatientDetailPage = () => {
 
       case "OccupationalHealthcare":
         newEntry = {
-          type,
-          description,
-          date,
-          specialist,
+          ...baseEntry,
+          type: "OccupationalHealthcare",
           employerName,
           sickLeave:
             sickStart && sickEnd
@@ -88,14 +114,20 @@ const PatientDetailPage = () => {
 
     try {
       const res = await axios.post(
-        `http://localhost:3001/api/patients/${patient?.id}/entries`,
+        `http://localhost:3001/api/patients/${patient.id}/entries`,
         newEntry,
       );
 
       setPatient((prev) =>
-        prev ? { ...prev, entries: prev.entries.concat(res.data) } : prev,
+        prev
+          ? {
+              ...prev,
+              entries: prev.entries.concat(res.data),
+            }
+          : prev,
       );
 
+      // 🔥 RESET LIMPIO
       setDescription("");
       setDate("");
       setSpecialist("");
@@ -107,6 +139,10 @@ const PatientDetailPage = () => {
       setEmployerName("");
       setSickStart("");
       setSickEnd("");
+
+      setSelectedCodes([]); // 🔥 IMPORTANTE
+
+      setError(""); // limpia error si todo salió bien
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
         setError(e.response?.data?.error || "Error adding entry");
@@ -131,6 +167,7 @@ const PatientDetailPage = () => {
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       <form onSubmit={handleSubmit}>
+        {/* DESCRIPTION */}
         <div>
           description
           <input
@@ -139,6 +176,7 @@ const PatientDetailPage = () => {
           />
         </div>
 
+        {/* DATE */}
         <div>
           date
           <input
@@ -148,6 +186,7 @@ const PatientDetailPage = () => {
           />
         </div>
 
+        {/* SPECIALIST */}
         <div>
           specialist
           <input
@@ -156,20 +195,36 @@ const PatientDetailPage = () => {
           />
         </div>
 
-        <div>
-          health rating
-          <input
-            type="number"
-            value={healthCheckRating}
-            onChange={(e) => setHealthCheckRating(Number(e.target.value))}
-          />
-        </div>
+        {/* DIAGNOSIS SELECT */}
+        <FormControl fullWidth style={{ marginTop: "10px" }}>
+          <InputLabel>Diagnosis Codes</InputLabel>
+          <Select
+            multiple
+            open={open}
+            onOpen={() => setOpen(true)}
+            onClose={() => setOpen(false)}
+            value={selectedCodes}
+            onChange={(e) => {
+              setSelectedCodes(e.target.value as string[]);
+              setOpen(false); // 🔥 esto lo cierra al seleccionar
+            }}
+            input={<OutlinedInput label="Diagnosis Codes" />}
+          >
+            {diagnoses.map((d) => (
+              <MenuItem key={d.code} value={d.code}>
+                {d.code} {d.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
-        <div>
+        {/* ENTRY TYPE */}
+        <div style={{ marginTop: "10px" }}>
+          <strong>Type:</strong>
+
           <label>
             <input
               type="radio"
-              value="HealthCheck"
               checked={type === "HealthCheck"}
               onChange={() => setType("HealthCheck")}
             />
@@ -179,7 +234,6 @@ const PatientDetailPage = () => {
           <label>
             <input
               type="radio"
-              value="Hospital"
               checked={type === "Hospital"}
               onChange={() => setType("Hospital")}
             />
@@ -189,78 +243,104 @@ const PatientDetailPage = () => {
           <label>
             <input
               type="radio"
-              value="OccupationalHealthcare"
               checked={type === "OccupationalHealthcare"}
               onChange={() => setType("OccupationalHealthcare")}
             />
             Occupational
           </label>
-
-          {type === "Hospital" && (
-            <>
-              <div>
-                discharge date
-                <input
-                  value={dischargeDate}
-                  onChange={(e) => setDischargeDate(e.target.value)}
-                />
-              </div>
-              <div>
-                criteria
-                <input
-                  value={dischargeCriteria}
-                  onChange={(e) => setDischargeCriteria(e.target.value)}
-                />
-              </div>
-            </>
-          )}
-
-          {type === "OccupationalHealthcare" && (
-            <>
-              <div>
-                employer name
-                <input
-                  value={employerName}
-                  onChange={(e) => setEmployerName(e.target.value)}
-                />
-              </div>
-              <div>
-                sick leave start
-                <input
-                  value={sickStart}
-                  onChange={(e) => setSickStart(e.target.value)}
-                />
-              </div>
-              <div>
-                sick leave end
-                <input
-                  value={sickEnd}
-                  onChange={(e) => setSickEnd(e.target.value)}
-                />
-              </div>
-            </>
-          )}
         </div>
+
+        {/* HEALTHCHECK */}
+        {type === "HealthCheck" && (
+          <div>
+            Health rating:
+            {[0, 1, 2, 3].map((val) => (
+              <label key={val} style={{ marginRight: "10px" }}>
+                <input
+                  type="radio"
+                  checked={healthCheckRating === val}
+                  onChange={() => setHealthCheckRating(val)}
+                />
+                {val}
+              </label>
+            ))}
+          </div>
+        )}
+
+        {/* HOSPITAL */}
+        {type === "Hospital" && (
+          <>
+            <div>
+              discharge date
+              <input
+                type="date"
+                value={dischargeDate}
+                onChange={(e) => setDischargeDate(e.target.value)}
+              />
+            </div>
+
+            <div>
+              criteria
+              <input
+                value={dischargeCriteria}
+                onChange={(e) => setDischargeCriteria(e.target.value)}
+              />
+            </div>
+          </>
+        )}
+
+        {/* OCCUPATIONAL */}
+        {type === "OccupationalHealthcare" && (
+          <>
+            <div>
+              employer name
+              <input
+                value={employerName}
+                onChange={(e) => setEmployerName(e.target.value)}
+              />
+            </div>
+
+            <div>
+              sick leave start
+              <input
+                type="date"
+                value={sickStart}
+                onChange={(e) => setSickStart(e.target.value)}
+              />
+            </div>
+
+            <div>
+              sick leave end
+              <input
+                type="date"
+                value={sickEnd}
+                onChange={(e) => setSickEnd(e.target.value)}
+              />
+            </div>
+          </>
+        )}
 
         <button type="submit">add</button>
       </form>
 
       <h3>Entries</h3>
 
-      {patient.entries.length === 0 && <p>No entries yet</p>}
-
-      {patient.entries.map((entry) => (
-        <div
-          key={entry.id}
-          style={{
-            border: "1px solid gray",
-            marginBottom: "10px",
-            padding: "10px",
-          }}
-        >
-          <EntryDetails entry={entry} />
-        </div>
-      ))}
+      {!patient.entries || patient.entries.length === 0 ? (
+        <p>No entries yet</p>
+      ) : (
+        patient.entries.map((entry) => (
+          <div
+            key={entry.id}
+            style={{
+              border: "1px solid gray",
+              marginBottom: "10px",
+              padding: "10px",
+            }}
+          >
+            <EntryDetails entry={entry} />
+          </div>
+        ))
+      )}
     </div>
   );
 };
