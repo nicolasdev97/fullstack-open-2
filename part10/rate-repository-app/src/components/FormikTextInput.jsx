@@ -11,6 +11,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 10,
     backgroundColor: "white",
+    color: "#000",
   },
   inputError: {
     borderColor: "#d73a4a",
@@ -42,7 +43,13 @@ const FormikTextInput = ({ name, ...props }) => {
 const TextInput = ({ style, error, ...props }) => {
   const textInputStyle = [styles.input, style, error && styles.inputError];
 
-  return <NativeTextInput style={textInputStyle} {...props} />;
+  return (
+    <NativeTextInput
+      style={textInputStyle}
+      placeholderTextColor="#999"
+      {...props}
+    />
+  );
 };
 
 export default FormikTextInput;

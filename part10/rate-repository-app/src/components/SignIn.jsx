@@ -1,5 +1,10 @@
 import React from "react";
-import { View, Button, StyleSheet } from "react-native";
+import {
+  View,
+  Button,
+  StyleSheet,
+  TextInput as NativeTextInput,
+} from "react-native";
 import { Formik } from "formik";
 import FormikTextInput from "./FormikTextInput";
 import * as yup from "yup";
