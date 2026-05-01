@@ -10,11 +10,13 @@ const styles = StyleSheet.create({
   },
 });
 
-const Main = () => {
+const Main = (props) => {
+  const { children } = props;
+
   return (
     <View style={styles.container}>
       <AppBar />
-      <RepositoryList />
+      {children ? children : <RepositoryList />}
     </View>
   );
 };

@@ -1,5 +1,5 @@
 import Main from "../../src/components/Main";
 
-export default function HomeScreen() {
+export default function Index() {
   return <Main />;
 }
