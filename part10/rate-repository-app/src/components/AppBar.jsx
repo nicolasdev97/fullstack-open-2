@@ -1,14 +1,18 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableWithoutFeedback } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import Constants from "expo-constants";
+import { Link } from "expo-router";
 
 const styles = StyleSheet.create({
   container: {
     paddingTop: Constants.statusBarHeight,
     backgroundColor: "#24292e",
-    paddingHorizontal: 10,
+  },
+  scroll: {
+    flexDirection: "row",
   },
   tab: {
+    paddingHorizontal: 15,
     paddingVertical: 15,
   },
   text: {
@@ -18,20 +22,27 @@ const styles = StyleSheet.create({
   },
 });
 
-const AppBarTab = ({ text }) => {
+const AppBarTab = ({ text, href }) => {
   return (
-    <TouchableWithoutFeedback>
-      <View style={styles.tab}>
-        <Text style={styles.text}>{text}</Text>
-      </View>
-    </TouchableWithoutFeedback>
+    <Link href={href} style={styles.tab}>
+      <Text style={styles.text}>{text}</Text>
+    </Link>
   );
 };
 
 const AppBar = () => {
   return (
     <View style={styles.container}>
-      <AppBarTab text="Repositories" />
+      <ScrollView horizontal contentContainerStyle={styles.scroll}>
+        <AppBarTab text="Repositories" href="/" />
+        <AppBarTab text="Sign In" href="/signin" />
+
+        {/* Tabs extra para probar scroll */}
+        <AppBarTab text="Tab 1" href="/" />
+        <AppBarTab text="Tab 2" href="/" />
+        <AppBarTab text="Tab 3" href="/" />
+        <AppBarTab text="Tab 4" href="/" />
+      </ScrollView>
     </View>
   );
 };
