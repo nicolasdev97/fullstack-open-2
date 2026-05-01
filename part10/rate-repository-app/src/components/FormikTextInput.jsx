@@ -12,11 +12,11 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   inputError: {
-    borderColor: "red",
+    borderColor: "#d73a4a",
   },
   errorText: {
     marginTop: 5,
-    color: "red",
+    color: "#d73a4a",
   },
 });
 
