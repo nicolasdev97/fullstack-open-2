@@ -3,9 +3,7 @@ import { Formik } from "formik";
 import FormikTextInput from "./FormikTextInput";
 import * as yup from "yup";
 import useSignIn from "../hooks/useSignIn";
-import AuthStorage from "../utils/authStorage";
-
-const authStorage = new AuthStorage();
+import { useRouter } from "expo-router";
 
 const styles = StyleSheet.create({
   container: {
@@ -25,6 +23,8 @@ const initialValues = {
 const SignIn = () => {
   const [signIn] = useSignIn();
 
+  const router = useRouter();
+
   const onSubmit = async (values) => {
     const { username, password } = values;
 
@@ -32,9 +32,7 @@ const SignIn = () => {
       const { data } = await signIn({ username, password });
       console.log("LOGIN RESULT:", data);
 
-      const accessToken = data.authenticate.accessToken;
-      await authStorage.setAccessToken(accessToken);
-      console.log("TOKEN GUARDADO:", accessToken);
+      router.replace("/");
     } catch (e) {
       console.log(e);
     }
