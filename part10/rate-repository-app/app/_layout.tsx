@@ -1,11 +1,15 @@
 import { Stack } from "expo-router";
+import { ApolloProvider } from "@apollo/client/react";
+import client from "../src/apolloClient";
 
 export default function Layout() {
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    />
+    <ApolloProvider client={client}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      />
+    </ApolloProvider>
   );
 }
