@@ -3,6 +3,9 @@ import { Formik } from "formik";
 import FormikTextInput from "./FormikTextInput";
 import * as yup from "yup";
 import useSignIn from "../hooks/useSignIn";
+import AuthStorage from "../utils/authStorage";
+
+const authStorage = new AuthStorage();
 
 const styles = StyleSheet.create({
   container: {
@@ -28,6 +31,10 @@ const SignIn = () => {
     try {
       const { data } = await signIn({ username, password });
       console.log("LOGIN RESULT:", data);
+
+      const accessToken = data.authenticate.accessToken;
+      await authStorage.setAccessToken(accessToken);
+      console.log("TOKEN GUARDADO:", accessToken);
     } catch (e) {
       console.log(e);
     }
