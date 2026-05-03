@@ -10,8 +10,6 @@ const styles = StyleSheet.create({
   },
 });
 
-const ItemSeparator = () => <View style={styles.separator} />;
-
 // This component is for testing purposes
 export const RepositoryListContainer = ({ repositories }) => {
   const repositoryNodes = repositories
@@ -19,12 +17,11 @@ export const RepositoryListContainer = ({ repositories }) => {
     : [];
 
   return (
-    <FlatList
-      data={repositoryNodes}
-      keyExtractor={(item) => item.id}
-      ItemSeparatorComponent={ItemSeparator}
-      renderItem={({ item }) => <RepositoryItem item={item} />}
-    />
+    <>
+      {repositoryNodes.map((repo) => (
+        <RepositoryItem key={repo.id} item={repo} />
+      ))}
+    </>
   );
 };
 

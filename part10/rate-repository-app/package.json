@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@testing-library/jest-native": "^5.4.3",
-    "@testing-library/react-native": "^13.3.3",
+    "@testing-library/react-native": "^12.4.0",
     "@types/react": "~19.1.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^29.7.0",
