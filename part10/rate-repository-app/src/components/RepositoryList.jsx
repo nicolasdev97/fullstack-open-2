@@ -13,6 +13,11 @@ const styles = StyleSheet.create({
   separator: {
     height: 10,
   },
+  header: {
+    backgroundColor: "#f5f5f5",
+    padding: 10,
+    marginBottom: 5,
+  },
 });
 
 // Testing component (mocked data)
@@ -33,7 +38,11 @@ export const RepositoryListContainer = ({ repositories, order, setOrder }) => {
           <RepositoryItem item={item} />
         </Pressable>
       )}
-      ListHeaderComponent={<OrderSelector order={order} setOrder={setOrder} />}
+      ListHeaderComponent={
+        <View style={styles.header}>
+          <OrderSelector order={order} setOrder={setOrder} />
+        </View>
+      }
     />
   );
 };
