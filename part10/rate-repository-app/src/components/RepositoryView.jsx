@@ -1,11 +1,13 @@
-import React from "react";
-import { View, Pressable, Text } from "react-native";
-import { useLocalSearchParams } from "expo-router";
-import { GET_REPOSITORY } from "../graphql/queries";
-import { useQuery } from "@apollo/client";
+import { FlatList, View, Pressable } from "react-native";
+import Text from "./Text";
 import * as Linking from "expo-linking";
 
+import ReviewItem from "./ReviewItem";
 import RepositoryItem from "../../src/components/RepositoryItem";
+
+import { useQuery } from "@apollo/client";
+import { GET_REPOSITORY } from "../graphql/queries";
+import { useLocalSearchParams } from "expo-router";
 
 const RepositoryView = () => {
   const { id } = useLocalSearchParams();
@@ -22,8 +24,14 @@ const RepositoryView = () => {
 
   const repository = data?.repository;
 
-  return (
-    <View>
+  const reviews = repository?.reviews?.edges?.map((edge) => edge.node) || [];
+
+  const ItemSeparator = () => (
+    <View style={{ height: 10, backgroundColor: "lightgray" }} />
+  );
+
+  const RepositoryHeader = () => (
+    <View style={{ backgroundColor: "white" }}>
       <RepositoryItem item={repository} />
 
       <Pressable
@@ -39,7 +47,18 @@ const RepositoryView = () => {
           Open in GitHub
         </Text>
       </Pressable>
+      <ItemSeparator />
     </View>
+  );
+
+  return (
+    <FlatList
+      data={reviews}
+      renderItem={({ item }) => <ReviewItem review={item} />}
+      keyExtractor={(item) => item.id}
+      ListHeaderComponent={RepositoryHeader}
+      ItemSeparatorComponent={ItemSeparator}
+    />
   );
 };
 
