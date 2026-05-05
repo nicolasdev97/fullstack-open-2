@@ -8,6 +8,9 @@ import RepositoryItem from "./RepositoryItem";
 import { useRouter } from "expo-router";
 
 import OrderSelector from "./OrderSelector";
+import SearchInput from "./SearchInput";
+
+import { useDebounce } from "use-debounce";
 
 const styles = StyleSheet.create({
   separator: {
@@ -20,8 +23,23 @@ const styles = StyleSheet.create({
   },
 });
 
+const RepositoryListHeader = ({ search, setSearch, order, setOrder }) => {
+  return (
+    <View style={{ backgroundColor: "#f5f5f5" }}>
+      <SearchInput value={search} onChange={setSearch} />
+      <OrderSelector order={order} setOrder={setOrder} />
+    </View>
+  );
+};
+
 // Testing component (mocked data)
-export const RepositoryListContainer = ({ repositories, order, setOrder }) => {
+export const RepositoryListContainer = ({
+  repositories,
+  order,
+  setOrder,
+  search,
+  setSearch,
+}) => {
   const router = useRouter();
 
   const repositoryNodes = repositories?.edges?.map((edge) => edge.node) || [];
@@ -39,9 +57,12 @@ export const RepositoryListContainer = ({ repositories, order, setOrder }) => {
         </Pressable>
       )}
       ListHeaderComponent={
-        <View style={styles.header}>
-          <OrderSelector order={order} setOrder={setOrder} />
-        </View>
+        <RepositoryListHeader
+          search={search}
+          setSearch={setSearch}
+          order={order}
+          setOrder={setOrder}
+        />
       }
     />
   );
@@ -50,29 +71,41 @@ export const RepositoryListContainer = ({ repositories, order, setOrder }) => {
 // Real component (fetches data)
 const RepositoryList = () => {
   const [order, setOrder] = useState("LATEST");
+  const [search, setSearch] = useState("");
+
+  const [debouncedSearch] = useDebounce(search, 500);
 
   const variables = useMemo(() => {
+    let orderVars;
+
     switch (order) {
       case "HIGHEST":
-        return { orderBy: "RATING_AVERAGE", orderDirection: "DESC" };
+        orderVars = { orderBy: "RATING_AVERAGE", orderDirection: "DESC" };
+        break;
       case "LOWEST":
-        return { orderBy: "RATING_AVERAGE", orderDirection: "ASC" };
+        orderVars = { orderBy: "RATING_AVERAGE", orderDirection: "ASC" };
+        break;
       default:
-        return { orderBy: "CREATED_AT", orderDirection: "DESC" };
+        orderVars = { orderBy: "CREATED_AT", orderDirection: "DESC" };
     }
-  }, [order]);
+
+    return {
+      ...orderVars,
+      searchKeyword: debouncedSearch || undefined,
+    };
+  }, [order, debouncedSearch]);
 
   const { repositories, loading } = useRepositories(variables);
 
-  if (loading) {
-    return <Text>Loading...</Text>;
-  }
+  if (loading) return <Text>Loading...</Text>;
 
   return (
     <RepositoryListContainer
       repositories={repositories}
       order={order}
       setOrder={setOrder}
+      search={search}
+      setSearch={setSearch}
     />
   );
 };

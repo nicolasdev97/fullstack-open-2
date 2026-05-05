@@ -1,32 +1,42 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { Picker } from "@react-native-picker/picker";
+import { Dropdown } from "react-native-element-dropdown";
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "white",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#e1e4e8",
-    overflow: "hidden",
+    padding: 10,
+    backgroundColor: "#f5f5f5",
   },
-  picker: {
+  dropdown: {
     height: 50,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    backgroundColor: "white",
   },
 });
+
+const data = [
+  { label: "Latest repositories", value: "LATEST" },
+  { label: "Highest rated repositories", value: "HIGHEST" },
+  { label: "Lowest rated repositories", value: "LOWEST" },
+];
 
 const OrderSelector = ({ order, setOrder }) => {
   return (
     <View style={styles.container}>
-      <Picker
-        selectedValue={order}
-        onValueChange={(value) => setOrder(value)}
-        style={styles.picker}
-      >
-        <Picker.Item label="Latest repositories" value="LATEST" />
-        <Picker.Item label="Highest rated repositories" value="HIGHEST" />
-        <Picker.Item label="Lowest rated repositories" value="LOWEST" />
-      </Picker>
+      <Dropdown
+        style={styles.dropdown}
+        data={data}
+        labelField="label"
+        valueField="value"
+        placeholder="Select order"
+        value={order}
+        onChange={(item) => {
+          setOrder(item.value);
+        }}
+      />
     </View>
   );
 };
