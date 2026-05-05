@@ -4,7 +4,7 @@ import theme from "../../constants/theme";
 
 const styles = StyleSheet.create({
   text: {
-    fontFamily: theme.fonts.main,
+    fontFamily: theme.fonts?.main || "System",
   },
 });
 

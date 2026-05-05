@@ -1,8 +1,11 @@
 import React from "react";
-import { FlatList, View, StyleSheet, Text } from "react-native";
+import { FlatList, View, StyleSheet, Pressable } from "react-native";
+import Text from "./Text";
 
 import useRepositories from "../hooks/useRepositories";
 import RepositoryItem from "./RepositoryItem";
+
+import { useRouter } from "expo-router";
 
 const styles = StyleSheet.create({
   separator: {
@@ -12,6 +15,8 @@ const styles = StyleSheet.create({
 
 // Testing component (mocked data)
 export const RepositoryListContainer = ({ repositories }) => {
+  const router = useRouter();
+
   const repositoryNodes = repositories?.edges?.map((edge) => edge.node) || [];
 
   const ItemSeparator = () => <View style={styles.separator} />;
@@ -20,8 +25,12 @@ export const RepositoryListContainer = ({ repositories }) => {
     <FlatList
       data={repositoryNodes}
       ItemSeparatorComponent={ItemSeparator}
-      renderItem={({ item }) => <RepositoryItem item={item} />}
       keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <Pressable onPress={() => router.push(`/repository/${item.id}`)}>
+          <RepositoryItem item={item} />
+        </Pressable>
+      )}
     />
   );
 };
