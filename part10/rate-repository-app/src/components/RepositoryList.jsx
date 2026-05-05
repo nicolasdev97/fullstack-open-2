@@ -1,4 +1,4 @@
-import React from "react";
+import { useState, useMemo } from "react";
 import { FlatList, View, StyleSheet, Pressable } from "react-native";
 import Text from "./Text";
 
@@ -7,6 +7,8 @@ import RepositoryItem from "./RepositoryItem";
 
 import { useRouter } from "expo-router";
 
+import OrderSelector from "./OrderSelector";
+
 const styles = StyleSheet.create({
   separator: {
     height: 10,
@@ -14,7 +16,7 @@ const styles = StyleSheet.create({
 });
 
 // Testing component (mocked data)
-export const RepositoryListContainer = ({ repositories }) => {
+export const RepositoryListContainer = ({ repositories, order, setOrder }) => {
   const router = useRouter();
 
   const repositoryNodes = repositories?.edges?.map((edge) => edge.node) || [];
@@ -31,19 +33,39 @@ export const RepositoryListContainer = ({ repositories }) => {
           <RepositoryItem item={item} />
         </Pressable>
       )}
+      ListHeaderComponent={<OrderSelector order={order} setOrder={setOrder} />}
     />
   );
 };
 
 // Real component (fetches data)
 const RepositoryList = () => {
-  const { repositories, loading } = useRepositories();
+  const [order, setOrder] = useState("LATEST");
+
+  const variables = useMemo(() => {
+    switch (order) {
+      case "HIGHEST":
+        return { orderBy: "RATING_AVERAGE", orderDirection: "DESC" };
+      case "LOWEST":
+        return { orderBy: "RATING_AVERAGE", orderDirection: "ASC" };
+      default:
+        return { orderBy: "CREATED_AT", orderDirection: "DESC" };
+    }
+  }, [order]);
+
+  const { repositories, loading } = useRepositories(variables);
 
   if (loading) {
     return <Text>Loading...</Text>;
   }
 
-  return <RepositoryListContainer repositories={repositories} />;
+  return (
+    <RepositoryListContainer
+      repositories={repositories}
+      order={order}
+      setOrder={setOrder}
+    />
+  );
 };
 
 export default RepositoryList;
