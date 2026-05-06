@@ -6,6 +6,7 @@ import { useQuery, useApolloClient } from "@apollo/client";
 import { useContext } from "react";
 import { GET_ME } from "../graphql/queries";
 import AuthStorageContext from "../contexts/AuthStorageContext";
+import useCurrentUser from "../hooks/useCurrentUser";
 
 const styles = StyleSheet.create({
   container: {
@@ -52,6 +53,7 @@ const AppBar = () => {
       <ScrollView horizontal contentContainerStyle={styles.scroll}>
         <AppBarTab text="Repositories" href="/" />
         {data?.me && <AppBarTab text="Create a review" href="/create-review" />}
+        {data?.me && <AppBarTab text="My reviews" href="/my-reviews" />}
         {data?.me ? (
           <Pressable onPress={handleSignOut}>
             <View style={styles.tab}>
