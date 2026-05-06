@@ -1,6 +1,7 @@
 import { FlatList, View, Pressable } from "react-native";
 import Text from "./Text";
 import * as Linking from "expo-linking";
+import { useRef } from "react";
 
 import ReviewItem from "./ReviewItem";
 import RepositoryItem from "../../src/components/RepositoryItem";
@@ -13,10 +14,49 @@ const RepositoryView = () => {
   const { id } = useLocalSearchParams();
   const repositoryId = Array.isArray(id) ? id[0] : id;
 
-  const { data, loading } = useQuery(GET_REPOSITORY, {
-    variables: { id: repositoryId },
+  const { data, loading, fetchMore } = useQuery(GET_REPOSITORY, {
+    variables: {
+      id: repositoryId,
+      first: 6,
+    },
     fetchPolicy: "cache-and-network",
   });
+
+  const onEndReachedCalledDuringMomentum = useRef(false);
+
+  const handleFetchMore = () => {
+    if (onEndReachedCalledDuringMomentum.current) return;
+
+    const pageInfo = data?.repository?.reviews?.pageInfo;
+
+    if (!pageInfo?.hasNextPage) return;
+
+    onEndReachedCalledDuringMomentum.current = true;
+
+    fetchMore({
+      variables: {
+        id: repositoryId,
+        first: 7,
+        after: pageInfo.endCursor,
+      },
+      updateQuery: (previousResult, { fetchMoreResult }) => {
+        if (!fetchMoreResult) return previousResult;
+
+        return {
+          repository: {
+            ...fetchMoreResult.repository,
+            reviews: {
+              ...fetchMoreResult.repository.reviews,
+              edges: [
+                ...previousResult.repository.reviews.edges,
+                ...fetchMoreResult.repository.reviews.edges,
+              ],
+            },
+          },
+        };
+      },
+    });
+  };
 
   if (loading) {
     return <Text>Loading...</Text>;
@@ -58,6 +98,11 @@ const RepositoryView = () => {
       keyExtractor={(item) => item.id}
       ListHeaderComponent={RepositoryHeader}
       ItemSeparatorComponent={ItemSeparator}
+      onEndReached={handleFetchMore}
+      onEndReachedThreshold={0.5}
+      onMomentumScrollBegin={() => {
+        onEndReachedCalledDuringMomentum.current = false;
+      }}
     />
   );
 };
